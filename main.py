@@ -11,8 +11,10 @@ class Home:
         self.home_window.state('zoomed')
         self.frame_banner=Frame(self.home_window,bg=background)
         self.frame_banner.grid(row=0,column=0)
-        self.banner_img=ImageTk.PhotoImage(Image.open('icons\\home_ban.jpg'))
-        self.banner_lbl=Label(self.frame_banner,image=self.banner_img)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.home_window.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
         self.banner_lbl.grid(row=0,column=0)
         #---------------Icons-------------------
         self.quick_bill_icon=ImageTk.PhotoImage(Image.open('icons\\billing.png'))
@@ -63,27 +65,32 @@ class Home:
 class Inventory:
     def __init__(self):
         self.inventory_win=Toplevel()
-        self.inventory_win.title("Inventory")
-        self.inventory_win.geometry("800x500+280+175")
+        self.inventory_win.state("zoomed")
         self.inventory_win.config(bg=background)
         self.frame_banner=Frame(self.inventory_win,bg=background)
         self.frame_banner.grid(row=0,column=0)
-        self.banner_img=ImageTk.PhotoImage(Image.open('icons\\inv_ban.jpg'))
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.inventory_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
         self.add_item_img=ImageTk.PhotoImage(Image.open('icons\\item.png'))
         self.raw_item_img=ImageTk.PhotoImage(Image.open('icons\\raw.png'))
         self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
-        self.banner_lbl=Label(self.frame_banner,image=self.banner_img)
+        self.inv_banner=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
         self.banner_lbl.grid(row=0,column=0)
         self.body_frame=Frame(self.inventory_win,bg=background)
         self.body_frame.grid(row=1,column=0,pady=20)
         self.inventory_win.focus_force()
-        self.add_item=Button(self.body_frame,text="Menu Items ",font="Times 22 bold",image=self.add_item_img,compound="right",bg=background,fg=foreground,bd=0,activebackground=background, command=self.menu_page)
-        self.add_item.grid(row=0,column=0,pady=25)
-        self.add_rawitem=Button(self.body_frame,text="Raw Materials ",font="Times 22 bold",image=self.raw_item_img,compound="right",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
-        self.add_rawitem.grid(row=1,column=0)
+        self.ban=Label(self.body_frame,text="  Inventory MENU",font="Times 40 bold",compound="left",bg=background,fg=foreground,image=self.inv_banner)
+        self.ban.grid(row=0,column=0)
+        self.add_item=Button(self.body_frame,text="  Menu Items ",font="Times 28 bold",image=self.add_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.menu_page)
+        self.add_item.grid(row=1,column=0,pady=15)
+        self.add_rawitem=Button(self.body_frame,text="  Raw Materials ",font="Times 28 bold",image=self.raw_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
+        self.add_rawitem.grid(row=2,column=0)
         self.back=Button(self.body_frame,text="Exit",font="Times 22 bold",image=self.Exit_icon,compound="top",bg=background,fg=foreground,bd=0,activebackground=background,command=self.inventory_win.destroy)
-        self.back.grid(row=2,column=0,pady=20)
+        self.back.grid(row=3,column=0,pady=20)
         self.inventory_win.resizable(0,0)
+        self.inventory_win.overrideredirect(1)
         self.inventory_win.mainloop()
 
     def menu_page(self):
@@ -97,49 +104,43 @@ class menu_items:
     def __init__(self):
         self.menu_win=Toplevel()
         self.menu_win.title("Menu Items")
-        self.menu_win.geometry("800x740+250+100")
+        self.menu_win.state("zoomed")
         self.menu_win.config(bg=background)
         self.frame_banner=Frame(self.menu_win,bg=background)
         self.frame_banner.grid(row=0,column=0)
-        self.banner_img=ImageTk.PhotoImage(Image.open('icons\\menu_banner.jpg'))
-        self.banner_lbl=Label(self.frame_banner,image=self.banner_img)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.menu_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
         self.banner_lbl.grid(row=0,column=0)
 
         self.body_frame=Frame(self.menu_win,bg=background)
-        self.body_frame.grid(row=1,column=0,pady=30)
-
+        self.body_frame.grid(row=1,column=0,pady=15)
         self.add_icon=ImageTk.PhotoImage(Image.open('icons\\add.png'))
         self.edit_icon=ImageTk.PhotoImage(Image.open('icons\\edit.png'))
         self.view_icon=ImageTk.PhotoImage(Image.open('icons\\view.png'))
-        self.search_icon=ImageTk.PhotoImage(Image.open('icons\\search.png'))
+        self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
         self.delete_icon=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
-
-        self.frame1=Frame(self.body_frame,bg=background)
-        self.frame1.grid(row=0,column=0,pady=20)
-        self.frame2=Frame(self.body_frame,bg=background)
-        self.frame2.grid(row=1,column=0,pady=20)
-        self.frame3=Frame(self.body_frame,bg=background)
-        self.frame3.grid(row=2,column=0,pady=20)
-        self.frame4=Frame(self.body_frame,bg=background)
-        self.frame4.grid(row=3, column=0, pady=20)
-        self.frame5=Frame(self.body_frame,bg=background)
-        self.frame5.grid(row=4,column=0,pady=20 )
-
-        self.add_item=Button(self.frame1,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
-        self.add_item.grid(row=0,column=0)
-        self.edit_item=Button(self.frame2,image=self.edit_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
-        self.edit_item.grid(row=0,column=0)
-        self.view_item=Button(self.frame3,image=self.view_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
-        self.view_item.grid(row=0,column=0)
-        self.search_item=Button(self.frame4,image=self.search_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
-        self.search_item.grid(row=0,column=0)
-        self.delete_item=Button(self.frame5,image=self.delete_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
-        self.delete_item.grid(row=0,column=0)
+        self.menu_banner_image=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
+        self.menu_ban=Label(self.body_frame,text="Add Items Menu",font="Times 40 bold",image=self.menu_banner_image,compound="left",bd=0,bg=background,fg=foreground,activebackground=background)
+        self.menu_ban.grid(row=0,column=0,pady=15)
+        self.add_item=Button(self.body_frame,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
+        self.add_item.grid(row=1,column=0,pady=15)
+        self.edit_item=Button(self.body_frame,image=self.edit_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
+        self.edit_item.grid(row=2,column=0,pady=15)
+        self.view_item=Button(self.body_frame,image=self.view_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
+        self.view_item.grid(row=3,column=0,pady=15)
+        
+        self.delete_item=Button(self.body_frame,image=self.delete_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
+        self.delete_item.grid(row=4,column=0,pady=15)
+        self.back=Button(self.body_frame,image=self.back_icon,command=self.menu_win.destroy,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font="Helvetica 20")
+        self.back.grid(row=5,column=0)
 
 
 
 
 
+        self.menu_win.overrideredirect(1)
         self.menu_win.mainloop()
 
 
@@ -190,7 +191,7 @@ class raw_items:
 
 
 
-        self.menu_win.mainloop()
+        self.raw_win.mainloop()
 
 
 
