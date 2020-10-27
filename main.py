@@ -3,9 +3,19 @@ from tkinter import *
 from tkinter.font import Font
 from tkinter import font
 from PIL import Image,ImageTk
+from tkinter import ttk
 from tkinter import messagebox
-background="lightsteelblue"
+#-----------Functions-------------
+def correct(inp):
+    if inp.isdigit():
+        return True
+    elif inp =="":
+        return True
+    else:
+        return False 
+background="lightgrey"
 foreground="black"
+#---------------------------------
 class Home:
     global background,foreground
     def __init__(self,master):
@@ -89,15 +99,15 @@ class Inventory:
         self.inventory_win.focus_force()
         self.ban=Label(self.frame_banner,text="  INVENTORY ",font="Helvetica 40 bold",compound="left",bg=background,fg=foreground,image=self.inv_banner)
         self.ban.grid(row=1,column=0,pady=10)
-        self.add_item=Button(self.body_frame,text="  Menu Items ",font="Helvetica 28 bold",image=self.add_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.menu_page)
+        self.add_item=Button(self.body_frame,text="  Menu Items ",font="Helvetica 20 bold",image=self.add_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.menu_page)
         self.add_item.grid(row=1,column=0,pady=20,sticky=t.W)
-        self.add_rawitem=Button(self.body_frame,text="  Raw Materials ",font="Helvetica 28 bold",image=self.raw_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
+        self.add_rawitem=Button(self.body_frame,text="  Raw Materials ",font="Helvetica 20 bold",image=self.raw_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
         self.add_rawitem.grid(row=2,column=0,sticky=t.W)
-        self.employee=Button(self.body_frame,text="  Employee \n  Registeration ",font="Helvetica 28 bold",image=self.employee_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
+        self.employee=Button(self.body_frame,text="  Employee \n  Registeration ",font="Helvetica 20 bold",image=self.employee_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
         self.employee.grid(row=3,column=0,pady=20,sticky=t.W)
-        self.category=Button(self.body_frame,text="  Category \n  Registeration ",font="Helvetica 28 bold",image=self.category_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
+        self.category=Button(self.body_frame,text="  Category \n  Registeration ",font="Helvetica 20 bold",image=self.category_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
         self.category.grid(row=4,column=0,pady=20,sticky=t.W)
-        self.back=Button(self.body_frame,font="Times 22 bold",image=self.Exit_icon,compound="top",bg=background,fg=foreground,bd=0,activebackground=background,command=self.inventory_win.destroy)
+        self.back=Button(self.body_frame,image=self.Exit_icon,compound="top",bg=background,fg=foreground,bd=0,activebackground=background,command=self.inventory_win.destroy)
         self.back.grid(row=5,column=0)
         self.inventory_win.bind("<Escape>",self.destroy)
         self.inventory_win.resizable(0,0)
@@ -138,7 +148,7 @@ class menu_items:
         self.menu_banner_image=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
         self.menu_ban=Label(self.body_frame,text=" ITEMS MENU",font="Helvetica 40 bold",image=self.menu_banner_image,compound="left",bd=0,bg=background,fg=foreground,activebackground=background)
         self.menu_ban.grid(row=0,column=0,pady=15)
-        self.add_item=Button(self.body_frame,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background)
+        self.add_item=Button(self.body_frame,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background,command=self.Add_)
         self.add_item.grid(row=1,column=0,pady=15)
         self.edit_item=Button(self.body_frame,image=self.edit_icon,bd=0,bg=background,fg=foreground,activebackground=background)
         self.edit_item.grid(row=2,column=0,pady=15)
@@ -154,11 +164,10 @@ class menu_items:
 
     def destroy(self,event):
         self.menu_win.destroy()
-
-
+    def Add_(self):
+        Add_Item()
 class raw_items:
     def __init__(self):
-         
         self.raw_win=Toplevel()
         self.raw_win.title("Menu Items")
         self.raw_win.state("zoomed")
@@ -170,7 +179,6 @@ class raw_items:
         self.main_banner=ImageTk.PhotoImage(self.banner_img)
         self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
         self.banner_lbl.grid(row=0,column=0)
-
         self.body_frame=Frame(self.raw_win,bg=background)
         self.body_frame.grid(row=1,column=0,pady=15)
         self.add_icon=ImageTk.PhotoImage(Image.open('icons\\add.png'))
@@ -197,6 +205,66 @@ class raw_items:
 
     def destroy(self,event):
         self.raw_win.destroy()    
+class Add_Item:
+    def __init__(self):
+        self.add_item_win=Toplevel()
+        self.add_item_win.state("zoomed")
+        self.add_item_win.config(bg=background)
+        self.frame_banner=Frame(self.add_item_win,bg=background)
+        self.frame_banner.grid(row=0,column=0)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.add_item_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
+        self.banner_lbl.grid(row=0,column=0)
+        self.body_frame=LabelFrame(self.add_item_win,bg=background,text="Item Discription",font="Times 40 bold",fg=foreground,bd=0)
+        self.body_frame.grid(row=1,column=0,pady=15,sticky=t.W)
+        self.regn_l=Label(self.body_frame,text="Reg. No *",font="consolas 20",bg=background,bd=1,fg=foreground)
+        self.regn_l.grid(row=1,column=0,pady=20,padx=20,sticky=t.W)
+        self.item_name_l=Label(self.body_frame,text="Item Name *",font="consolas 20",bg=background,fg=foreground)
+        self.item_name_l.grid(row=2,column=0,pady=20,padx=20,sticky=t.W)
+        self.rate_l=Label(self.body_frame,text="Rate *",font="consolas 20",bg=background,fg=foreground)
+        self.rate_l.grid(row=3,column=0,pady=20,padx=20,sticky=t.W)
+        self.cat_l=Label(self.body_frame,text="Unit *",font="consolas 20",bg=background,fg=foreground)
+        self.cat_l.grid(row=4,column=0,pady=20,padx=20,sticky=t.W)
+        #-----------Entry boxes--------------------------
+        self.regn_e=Entry(self.body_frame,font="consolas 18",width=15,bd=2,bg=background,fg=foreground)
+        self.regn_e.grid(row=1,column=1,pady=20,sticky=t.W)
+        self.regn_e.focus()
+        self.regn_e.bind("<Return>",lambda event: self.item_name_e.focus())
+        self.regn_e.bind("<Down>",lambda event: self.item_name_e.focus())
+        self.regn_e.bind("<Up>",lambda event: self.cat_combobox.focus())
+
+        self.item_name_e=Entry(self.body_frame,font="consolas 18",width=15,bd=2,bg=background,fg=foreground)
+        self.item_name_e.grid(row=2,column=1,pady=20,sticky=t.W)
+        self.item_name_e.bind("<Return>",lambda event: self.rate_e.focus())
+        self.item_name_e.bind("<Down>",lambda event: self.rate_e.focus())
+        self.item_name_e.bind("<Up>",lambda event: self.regn_e.focus())
+
+        self.rate_e=Entry(self.body_frame,font="consolas 18",width=15,bd=2,background=background,foreground=foreground)
+        self.rate_e.grid(row=3,column=1,pady=20,sticky=t.W)
+        self.reg=self.rate_e.register(correct)                                # Input only Integer type
+        self.rate_e.config(validate="key",validatecommand=(self.reg,"%P"))
+        self.rate_e.bind("<Return>",lambda event: self.cat_combobox.focus())
+        self.rate_e.bind("<Down>",lambda event: self.cat_combobox.focus())
+        self.rate_e.bind("<Up>",lambda event: self.item_name_e.focus())
+
+        self.cat_combobox=ttk.Combobox(self.body_frame,width=15,font="consolas 18")
+        self.cat_combobox["values"]=('Piece','Plate','Bottle','Siddique','Munna Bhaiya') 
+        self.cat_combobox.option_add('*TCombobox*Listbox.font',("consolas",18))
+        self.cat_combobox.grid(row=4,column=1,pady=20,sticky=t.W) 
+        self.cat_combobox.current(0)
+        self.cat_combobox.bind("<Return>",lambda event: self.save.focus())
+        self.cat_combobox.bind("<Up>",lambda event: self.rate_e.focus())
+
+        self.save=Button(self.body_frame,text="Save",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background)
+        self.save.grid(row=5,column=0,padx=65,pady=20,sticky=t.W)
+        self.back=Button(self.body_frame,text="Back",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background,command=self.add_item_win.destroy)
+        self.back.grid(row=5,column=1,pady=20,padx=10,sticky=t.W)
+        self.add_item_win.bind("<Escape>",self.back_b)
+        self.add_item_win.mainloop()
+    def back_b(self,event):
+        self.add_item_win.destroy()
 
 
 
