@@ -5,6 +5,8 @@ from tkinter import font
 from PIL import Image,ImageTk
 from tkinter import ttk
 from tkinter import messagebox
+from csv import DictWriter,writer
+import csv,os
 #-----------Functions-------------
 def correct(inp):
     if inp.isdigit():
@@ -13,13 +15,26 @@ def correct(inp):
         return True
     else:
         return False 
-background="lightgrey"
-foreground="black"
+def themes_data():
+    filename="themes_collection.csv"
+    file_exists=os.path.isfile(filename)
+    if not file_exists:
+        return "white","black"
+    with open(filename,"r") as f2:
+        csv_data=list(csv.reader(f2))
+        bg=csv_data[len(csv_data)-1][0]
+        fg=csv_data[len(csv_data)-1][1]
+        return bg,fg
+
+data=themes_data()
+background=str(data[0])
+foreground=str(data[1])
 #---------------------------------
 class Home:
     global background,foreground
-    def __init__(self,master):
-        self.home_window=master
+    def __init__(self):
+        self.home_window=Tk()
+        self.home_window.title("Restaurant  Billing System (KOT/POS)")
         self.home_window.state('zoomed')
         self.frame_banner=Frame(self.home_window,bg=background)
         self.frame_banner.grid(row=0,column=0)
@@ -60,25 +75,78 @@ class Home:
         self.takesaway.grid(row=0,column=0)
         self.report=Button(self.frame4,text="Report",image=self.reports_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
         self.report.grid(row=0,column=0)
-        self.settings=Button(self.frame5,text="Settings",image=self.setting_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
+        self.settings=Button(self.frame5,text="Settings",image=self.setting_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font,command=self.themes_page)
         self.settings.grid(row=0,column=0)
         self.Exit_b=Button(self.frame6,text="Exit",image=self.Exit_icon,bd=0,bg=background,fg=foreground,activebackground=background,command=self.exit,compound="top",font=main_font)
         self.Exit_b.grid(row=0,column=0)
-        self.home_window.overrideredirect(True)
+        #self.home_window.overrideredirect(True)
+        self.home_window.resizable(0,0)
         self.home_window.config(bg=background)
         self.home_window.bind("<Escape>",self.exit_s)
+        self.home_window.protocol('WM_DELETE_WINDOW',self.disabled)
         self.home_window.mainloop()
+    def disabled(self):
+        pass
     def inv_page(self):
         Inventory()
+    def themes_page(self):
+        Themes()
     def exit(self):
         if messagebox.askyesno(parent=self.home_window,title="Exit",message="Are You Sure!"):
             self.home_window.destroy()
     def exit_s(self,event):
         if messagebox.askyesno(parent=self.home_window,title="Exit",message="Are You Sure!"):
             self.home_window.destroy()
+class Themes:
+    def __init__(self):
+        self.themes_win=Toplevel()
+        self.themes_win.title("Themes Menu")
+        self.themes_win.geometry('400x400+450+200')
+        self.themes_win.config(bg='white')
+        self.theme_label=Label(self.themes_win,text="Select your choice",font='helvetica 19 bold',fg='black',bg='white')
+        self.theme_label.grid(row=0,column=0,padx=100,pady=20)
+        self.values=('white','grey','lightgrey','blue')
+        self.theme_combobox=ttk.Combobox(self.themes_win,width=15,font="helvetica 16",state='readonly')
+        self.theme_combobox["values"]=('white','grey','lightgrey','blue')
+        self.theme_combobox.option_add('*TCombobox*Listbox.font',("consolas",16))
+        self.theme_combobox.grid(row=1,column=0,padx=100,pady=10) 
+        self.theme_combobox.current(0)
+        self.theme_combobox.bind("<Return>",lambda event:self.save_func)
+        self.save=Button(self.themes_win,text="save",width=6,font="hevetica 16",command=self.save_func)
+        self.save.grid(row=4,column=0,pady=25)
+        
+        self.back=Button(self.themes_win,text="Back",width=6,font="hevetica 16",command=self.themes_win.destroy)
+        self.back.grid(row=6,column=0)
+        self.themes_win.focus_force()
+        self.themes_win.attributes('-toolwindow', True)
+    def save_func(self):
+        flag_status=False
+        filename="themes_collection.csv"
+        file_exists=os.path.isfile(filename)
+        with open(filename,"a",newline="") as f:
+            csv_writer=DictWriter(f,fieldnames=['background_current_status','foreground_current_status'])
+            if not file_exists:
+                csv_writer.writeheader()
+            csv_writer.writerow({
+                'background_current_status':str(self.theme_combobox.get()),
+                'foreground_current_status':'black',
+            })
+            flag_status=True
+        if flag_status is True:
+            if messagebox.askyesno(parent=self.themes_win,title="Save Changes",message="would you like to restart to see changes"):
+                python = sys.executable
+                os.execl(python, python, * sys.argv)
+
+           
+
+                
+                
+        
+        
 class Inventory:
     def __init__(self):
         self.inventory_win=Toplevel()
+        self.inventory_win.title("Inventory Menu")
         self.inventory_win.state("zoomed")
         self.inventory_win.config(bg=background)
         self.frame_banner=Frame(self.inventory_win,bg=background)
@@ -111,23 +179,18 @@ class Inventory:
         self.back.grid(row=5,column=0)
         self.inventory_win.bind("<Escape>",self.destroy)
         self.inventory_win.resizable(0,0)
-        self.inventory_win.overrideredirect(True)
-        self.inventory_win.mainloop()
-
+        self.inventory_win.attributes('-toolwindow', True)
+        #self.inventory_win.mainloop()
     def destroy(self,event):
-        self.inventory_win.destroy()   
-
+        self.inventory_win.destroy()
     def menu_page(self):
         menu_items()
-
     def raw_page(self):
         raw_items()
-
-
 class menu_items:
     def __init__(self):
         self.menu_win=Toplevel()
-        self.menu_win.title("Menu Items")
+        self.menu_win.title("Items Menu")
         self.menu_win.state("zoomed")
         self.menu_win.config(bg=background)
         self.frame_banner=Frame(self.menu_win,bg=background)
@@ -158,18 +221,17 @@ class menu_items:
         self.delete_item.grid(row=4,column=0,pady=15)
         self.back=Button(self.body_frame,image=self.back_icon,command=self.menu_win.destroy,bd=0,bg=background,fg=foreground,activebackground=background)
         self.back.grid(row=5,column=0,pady=15)
-        self.menu_win.bind("<Escape>",self.destroy)
-        self.menu_win.overrideredirect(1)
-        self.menu_win.mainloop()
-
-    def destroy(self,event):
+        self.menu_win.bind("<Escape>",self.destroy_)
+        self.menu_win.attributes('-toolwindow', True)
+        #self.menu_win.mainloop()
+    def destroy_(self,event):
         self.menu_win.destroy()
     def Add_(self):
         Add_Item()
 class raw_items:
     def __init__(self):
         self.raw_win=Toplevel()
-        self.raw_win.title("Menu Items")
+        self.raw_win.title("Raw Items Register")
         self.raw_win.state("zoomed")
         self.raw_win.config(bg=background)
         self.frame_banner=Frame(self.raw_win,bg=background)
@@ -200,14 +262,14 @@ class raw_items:
         self.back=Button(self.body_frame,image=self.back_icon,command=self.raw_win.destroy,bd=0,bg=background,fg=foreground,activebackground=background)
         self.back.grid(row=5,column=0,pady=15)
         self.raw_win.bind("<Escape>",self.destroy)
-        self.raw_win.overrideredirect(1)
-        self.raw_win.mainloop()
-
+        self.raw_win.attributes('-toolwindow', True)
+       #self.raw_win.mainloop()
     def destroy(self,event):
         self.raw_win.destroy()    
 class Add_Item:
     def __init__(self):
         self.add_item_win=Toplevel()
+        self.add_item_win.title("Items Register")
         self.add_item_win.state("zoomed")
         self.add_item_win.config(bg=background)
         self.frame_banner=Frame(self.add_item_win,bg=background)
@@ -262,15 +324,11 @@ class Add_Item:
         self.back=Button(self.body_frame,text="Back",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background,command=self.add_item_win.destroy)
         self.back.grid(row=5,column=1,pady=20,padx=10,sticky=t.W)
         self.add_item_win.bind("<Escape>",self.back_b)
-        self.add_item_win.mainloop()
+        self.add_item_win.attributes('-toolwindow', True)
+        #self.add_item_win.mainloop()
     def back_b(self,event):
         self.add_item_win.destroy()
 
-
-
-
-
-        
 if __name__ == "__main__":
-    window=Tk()
-    Home(window)
+    Home()
+   
