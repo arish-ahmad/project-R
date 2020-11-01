@@ -7,6 +7,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from csv import DictWriter,writer
 import csv,os
+import random
 #-----------Functions-------------
 def correct(inp):
     if inp.isdigit():
@@ -40,9 +41,10 @@ class Home:
         self.frame_banner.grid(row=0,column=0)
         self.banner_img=Image.open('icons\\home_ban.jpg')
         self.banner_img=self.banner_img.resize((self.home_window.winfo_screenwidth(),150),Image.ANTIALIAS)
-        self.main_banner=ImageTk.PhotoImage(self.banner_img)
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
-        self.banner_lbl.grid(row=0,column=0)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)        
+        self.banner_btn=Button(self.frame_banner,image=self.main_banner,bg=background,bd=0,activebackground=background,command=self.slideshow)
+        #self.banner_btn.bind('<Button-1>',self.slideshow)
+        self.banner_btn.grid(row=0,column=0)
         #---------------Icons-------------------
         self.quick_bill_icon=ImageTk.PhotoImage(Image.open('icons\\billing.png'))
         self.inventory_icon=ImageTk.PhotoImage(Image.open('icons\\kitchen.png'))
@@ -85,6 +87,12 @@ class Home:
         self.home_window.bind("<Escape>",self.exit_s)
         self.home_window.protocol('WM_DELETE_WINDOW',self.disabled)
         self.home_window.mainloop()
+    def slideshow(self):
+        self.banners_collection=['icons\\home_ban.jpg','icons\\ban2.jpg','icons\\ban3.jpg']
+        self.current_img=Image.open(random.choice(self.banners_collection))
+        self.current_img=self.current_img.resize((self.home_window.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.current_main_banner=ImageTk.PhotoImage(self.current_img)
+        self.banner_btn.configure(image=self.current_main_banner)
     def disabled(self):
         pass
     def inv_page(self):
