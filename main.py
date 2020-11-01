@@ -41,7 +41,7 @@ class Home:
         self.banner_img=Image.open('icons\\home_ban.jpg')
         self.banner_img=self.banner_img.resize((self.home_window.winfo_screenwidth(),150),Image.ANTIALIAS)
         self.main_banner=ImageTk.PhotoImage(self.banner_img)
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
         self.banner_lbl.grid(row=0,column=0)
         #---------------Icons-------------------
         self.quick_bill_icon=ImageTk.PhotoImage(Image.open('icons\\billing.png'))
@@ -75,7 +75,7 @@ class Home:
         self.takesaway.grid(row=0,column=0)
         self.report=Button(self.frame4,text="Report",image=self.reports_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
         self.report.grid(row=0,column=0)
-        self.settings=Button(self.frame5,text="Settings",image=self.setting_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font,command=self.themes_page)
+        self.settings=Button(self.frame5,text="Settings",image=self.setting_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font,command=self.setting_page)
         self.settings.grid(row=0,column=0)
         self.Exit_b=Button(self.frame6,text="Exit",image=self.Exit_icon,bd=0,bg=background,fg=foreground,activebackground=background,command=self.exit,compound="top",font=main_font)
         self.Exit_b.grid(row=0,column=0)
@@ -89,8 +89,8 @@ class Home:
         pass
     def inv_page(self):
         Inventory()
-    def themes_page(self):
-        Themes()
+    def setting_page(self):
+        Settings()
     def exit(self):
         if messagebox.askyesno(parent=self.home_window,title="Exit",message="Are You Sure!"):
             self.home_window.destroy()
@@ -102,7 +102,7 @@ class Themes:
         self.themes_win=Toplevel()
         self.themes_win.title("Themes Menu")
         self.themes_win.geometry('400x400+450+200')
-        self.themes_win.config(bg='white')
+        
         self.theme_label=Label(self.themes_win,text="Select your choice",font='helvetica 19 bold',fg='black',bg='white')
         self.theme_label.grid(row=0,column=0,padx=100,pady=20)
         self.values=('white','grey','lightgrey','blue')
@@ -111,12 +111,11 @@ class Themes:
         self.theme_combobox.option_add('*TCombobox*Listbox.font',("consolas",16))
         self.theme_combobox.grid(row=1,column=0,padx=100,pady=10) 
         self.theme_combobox.current(0)
-        self.theme_combobox.bind("<Return>",lambda event:self.save_func)
         self.save=Button(self.themes_win,text="save",width=6,font="hevetica 16",command=self.save_func)
         self.save.grid(row=4,column=0,pady=25)
-        
         self.back=Button(self.themes_win,text="Back",width=6,font="hevetica 16",command=self.themes_win.destroy)
         self.back.grid(row=6,column=0)
+        self.themes_win.config(bg='white')
         self.themes_win.focus_force()
         self.themes_win.attributes('-toolwindow', True)
     def save_func(self):
@@ -160,7 +159,7 @@ class Inventory:
         self.category_img=ImageTk.PhotoImage(Image.open('icons\\category.png'))
         self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
         self.inv_banner=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
         self.banner_lbl.grid(row=0,column=0)
         self.body_frame=Frame(self.inventory_win,bg=background)
         self.body_frame.grid(row=1,column=0)
@@ -198,7 +197,7 @@ class menu_items:
         self.banner_img=Image.open('icons\\home_ban.jpg')
         self.banner_img=self.banner_img.resize((self.menu_win.winfo_screenwidth(),150),Image.ANTIALIAS)
         self.main_banner=ImageTk.PhotoImage(self.banner_img)
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
         self.banner_lbl.grid(row=0,column=0)
 
         self.body_frame=Frame(self.menu_win,bg=background)
@@ -239,7 +238,7 @@ class raw_items:
         self.banner_img=Image.open('icons\\home_ban.jpg')
         self.banner_img=self.banner_img.resize((self.raw_win.winfo_screenwidth(),150),Image.ANTIALIAS)
         self.main_banner=ImageTk.PhotoImage(self.banner_img)
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
         self.banner_lbl.grid(row=0,column=0)
         self.body_frame=Frame(self.raw_win,bg=background)
         self.body_frame.grid(row=1,column=0,pady=15)
@@ -277,7 +276,7 @@ class Add_Item:
         self.banner_img=Image.open('icons\\home_ban.jpg')
         self.banner_img=self.banner_img.resize((self.add_item_win.winfo_screenwidth(),150),Image.ANTIALIAS)
         self.main_banner=ImageTk.PhotoImage(self.banner_img)
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
         self.banner_lbl.grid(row=0,column=0)
         self.body_frame=LabelFrame(self.add_item_win,bg=background,text="Item Discription",font="Times 40 bold",fg=foreground,bd=0)
         self.body_frame.grid(row=1,column=0,pady=15,sticky=t.W)
@@ -311,7 +310,7 @@ class Add_Item:
         self.rate_e.bind("<Down>",lambda event: self.cat_combobox.focus())
         self.rate_e.bind("<Up>",lambda event: self.item_name_e.focus())
 
-        self.cat_combobox=ttk.Combobox(self.body_frame,width=15,font="consolas 18")
+        self.cat_combobox=ttk.Combobox(self.body_frame,width=15,font="consolas 18",state="readonly")
         self.cat_combobox["values"]=('Piece','Plate','Bottle','Siddique','Munna Bhaiya') 
         self.cat_combobox.option_add('*TCombobox*Listbox.font',("consolas",18))
         self.cat_combobox.grid(row=4,column=1,pady=20,sticky=t.W) 
@@ -328,6 +327,50 @@ class Add_Item:
         #self.add_item_win.mainloop()
     def back_b(self,event):
         self.add_item_win.destroy()
+class Settings:
+    def __init__(self):
+        self.settings_win=Toplevel()
+        self.settings_win.title("Settings/Costomization")
+        self.settings_win.state("zoomed")
+        self.settings_win.config(bg=background)
+        self.frame_banner=Frame(self.settings_win,bg=background)
+        self.frame_banner.grid(row=0,column=0)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.settings_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.cd_img=ImageTk.PhotoImage(Image.open('icons\\company.png'))
+        self.printer_img=ImageTk.PhotoImage(Image.open('icons\\printer.png'))
+        self.theme_img=ImageTk.PhotoImage(Image.open('icons\\theme.png'))
+        self.help_img=ImageTk.PhotoImage(Image.open('icons\\help.png'))
+        self.about_img=ImageTk.PhotoImage(Image.open('icons\\about.png'))
+        self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
+        self.inv_banner=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
+        self.banner_lbl.grid(row=0,column=0)
+        self.body_frame=Frame(self.settings_win,bg=background)
+        self.body_frame.grid(row=1,column=0)
+        self.ban=Label(self.frame_banner,text=" Settings and customization ",font="Helvetica 40 bold",compound="left",bg=background,fg=foreground,image=self.inv_banner)
+        self.ban.grid(row=1,column=0)
+        self.cd=Button(self.body_frame,text="  Company Details ",font="Helvetica 20 bold",image=self.cd_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
+        self.cd.grid(row=1,column=0,pady=10,sticky=t.W)
+        self.printer_b=Button(self.body_frame,text="  Add Printer ",font="Helvetica 20 bold",image=self.printer_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
+        self.printer_b.grid(row=2,column=0,pady=10,sticky=t.W)
+        self.theme_b=Button(self.body_frame,text="  Change Theme ",font="Helvetica 20 bold",image=self.theme_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background,command=self.theme_page)
+        self.theme_b.grid(row=3,column=0,pady=10,sticky=t.W)
+        self.help=Button(self.body_frame,text="  Help ",font="Helvetica 20 bold",image=self.help_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
+        self.help.grid(row=4,column=0,pady=10,sticky=t.W)
+        self.about=Button(self.body_frame,text="  About Us ",font="Helvetica 20 bold",image=self.about_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
+        self.about.grid(row=5,column=0,pady=10,sticky=t.W)
+        self.back=Button(self.body_frame,image=self.Exit_icon,compound="top",bg=background,fg=foreground,bd=0,activebackground=background,command=self.settings_win.destroy)
+        self.back.grid(row=6,column=0)
+        self.settings_win.bind("<Escape>",self.destroy)
+        self.settings_win.resizable(0,0)
+        self.settings_win.attributes('-toolwindow', True)
+        #self.settings_win.mainloop()
+    def theme_page(self):
+        Themes()
+    def destroy(self,event):
+        self.settings_win.destroy()
 
 if __name__ == "__main__":
     Home()
