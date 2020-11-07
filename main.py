@@ -68,7 +68,7 @@ class Home:
         self.frame6=Frame(self.body_frame,bg=background)
         self.frame6.grid(row=1,column=2)
 
-        main_font=Font(family="Helvetica",size=25,weight="bold")
+        main_font=Font(family="candara",size=25,weight="bold")
         self.quick_bill=Button(self.frame1,text="Billing",image=self.quick_bill_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
         self.quick_bill.grid(row=0,column=0)
         self.items=Button(self.frame2,text="Inventory",image=self.inventory_icon,bd=0,bg=background,fg=foreground,activebackground=background,command=self.inv_page,compound="top",font=main_font)
@@ -115,7 +115,7 @@ class Themes:
         self.theme_label.grid(row=0,column=0,padx=100,pady=20)
         self.values=('white','grey','lightgrey','blue')
         self.theme_combobox=ttk.Combobox(self.themes_win,width=15,font="helvetica 16",state='readonly')
-        self.theme_combobox["values"]=('white','grey','lightgrey','blue')
+        self.theme_combobox["values"]=('white','grey','lightgrey','blue','mint cream','lavender','bisque2','dark sea green')
         self.theme_combobox.option_add('*TCombobox*Listbox.font',("consolas",16))
         self.theme_combobox.grid(row=1,column=0,padx=100,pady=10) 
         self.theme_combobox.current(0)
@@ -174,14 +174,14 @@ class Inventory:
         self.inventory_win.focus_force()
         self.ban=Label(self.frame_banner,text="  INVENTORY ",font="Helvetica 40 bold",compound="left",bg=background,fg=foreground,image=self.inv_banner)
         self.ban.grid(row=1,column=0,pady=10)
-        self.add_item=Button(self.body_frame,text="  Menu Items ",font="Helvetica 20 bold",image=self.add_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.menu_page)
-        self.add_item.grid(row=1,column=0,pady=20,sticky=t.W)
+        self.add_item=Button(self.body_frame,text=" Items \n Registration ",font="Helvetica 20 bold",image=self.add_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.menu_page)
+        self.add_item.grid(row=2,column=0,pady=10,sticky=t.W)
         self.add_rawitem=Button(self.body_frame,text="  Raw Materials ",font="Helvetica 20 bold",image=self.raw_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
-        self.add_rawitem.grid(row=2,column=0,sticky=t.W)
+        self.add_rawitem.grid(row=3,column=0,pady=10,sticky=t.W)
         self.employee=Button(self.body_frame,text="  Employee \n  Registeration ",font="Helvetica 20 bold",image=self.employee_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
-        self.employee.grid(row=3,column=0,pady=20,sticky=t.W)
+        self.employee.grid(row=4,column=0,pady=10,sticky=t.W)
         self.category=Button(self.body_frame,text="  Category \n  Registeration ",font="Helvetica 20 bold",image=self.category_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
-        self.category.grid(row=4,column=0,pady=20,sticky=t.W)
+        self.category.grid(row=1,column=0,pady=10,sticky=t.W)
         self.back=Button(self.body_frame,image=self.Exit_icon,compound="top",bg=background,fg=foreground,bd=0,activebackground=background,command=self.inventory_win.destroy)
         self.back.grid(row=5,column=0)
         self.inventory_win.bind("<Escape>",self.destroy)
@@ -256,6 +256,7 @@ class raw_items:
         self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
         self.delete_icon=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
         self.menu_banner_image=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
+
         self.menu_ban=Label(self.body_frame,text=" RAW MATERIALS",font="Helvetica 40 bold",image=self.menu_banner_image,compound="left",bd=0,bg=background,fg=foreground,activebackground=background)
         self.menu_ban.grid(row=0,column=0,pady=15)
         self.add_item=Button(self.body_frame,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background)
@@ -282,57 +283,125 @@ class Add_Item:
         self.frame_banner=Frame(self.add_item_win,bg=background)
         self.frame_banner.grid(row=0,column=0)
         self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
         self.banner_img=self.banner_img.resize((self.add_item_win.winfo_screenwidth(),150),Image.ANTIALIAS)
         self.main_banner=ImageTk.PhotoImage(self.banner_img)
         self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
         self.banner_lbl.grid(row=0,column=0)
-        self.body_frame=LabelFrame(self.add_item_win,bg=background,text="Item Discription",font="Times 40 bold",fg=foreground,bd=0)
-        self.body_frame.grid(row=1,column=0,pady=15,sticky=t.W)
-        self.regn_l=Label(self.body_frame,text="Reg. No *",font="consolas 20",bg=background,bd=1,fg=foreground)
-        self.regn_l.grid(row=1,column=0,pady=20,padx=20,sticky=t.W)
-        self.item_name_l=Label(self.body_frame,text="Item Name *",font="consolas 20",bg=background,fg=foreground)
-        self.item_name_l.grid(row=2,column=0,pady=20,padx=20,sticky=t.W)
-        self.rate_l=Label(self.body_frame,text="Rate *",font="consolas 20",bg=background,fg=foreground)
-        self.rate_l.grid(row=3,column=0,pady=20,padx=20,sticky=t.W)
-        self.cat_l=Label(self.body_frame,text="Unit *",font="consolas 20",bg=background,fg=foreground)
-        self.cat_l.grid(row=4,column=0,pady=20,padx=20,sticky=t.W)
+        self.frame_main=Frame(self.add_item_win,bg=background)
+        self.frame_main.grid(row=1,column=0)
+        main_font=Font(family="candara",size=18)
+        self.body_frame=LabelFrame(self.frame_main,bg=background,text="Item Discription",font="calibri 45 bold",fg=foreground,bd=5)
+        self.body_frame.grid(row=0,column=0)
+        self.regn_l=Label(self.body_frame,text="Reg. No *",font=main_font,bg=background,bd=1,fg=foreground)
+        self.regn_l.grid(row=1,column=0,pady=10,padx=20,sticky=t.W)
+        self.item_name_l=Label(self.body_frame,text="Item Name *",font=main_font,bg=background,fg=foreground)
+        self.item_name_l.grid(row=2,column=0,pady=10,padx=20,sticky=t.W)
+        self.rate_l=Label(self.body_frame,text="Rate *",font=main_font,bg=background,fg=foreground)
+        self.rate_l.grid(row=3,column=0,pady=10,padx=20,sticky=t.W)
+        self.cat_l=Label(self.body_frame,text="Unit *",font=main_font,bg=background,fg=foreground)
+        self.cat_l.grid(row=4,column=0,pady=10,padx=20,sticky=t.W)
         #-----------Entry boxes--------------------------
-        self.regn_e=Entry(self.body_frame,font="consolas 18",width=15,bd=2,bg=background,fg=foreground)
-        self.regn_e.grid(row=1,column=1,pady=20,sticky=t.W)
+        self.regn_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg=background,fg=foreground)
+        self.regn_e.grid(row=1,column=1,pady=10,sticky=t.W)
         self.regn_e.focus()
         self.regn_e.bind("<Return>",lambda event: self.item_name_e.focus())
         self.regn_e.bind("<Down>",lambda event: self.item_name_e.focus())
         self.regn_e.bind("<Up>",lambda event: self.cat_combobox.focus())
 
-        self.item_name_e=Entry(self.body_frame,font="consolas 18",width=15,bd=2,bg=background,fg=foreground)
-        self.item_name_e.grid(row=2,column=1,pady=20,sticky=t.W)
+        self.item_name_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg=background,fg=foreground)
+        self.item_name_e.grid(row=2,column=1,pady=10,sticky=t.W)
         self.item_name_e.bind("<Return>",lambda event: self.rate_e.focus())
         self.item_name_e.bind("<Down>",lambda event: self.rate_e.focus())
         self.item_name_e.bind("<Up>",lambda event: self.regn_e.focus())
 
-        self.rate_e=Entry(self.body_frame,font="consolas 18",width=15,bd=2,background=background,foreground=foreground)
-        self.rate_e.grid(row=3,column=1,pady=20,sticky=t.W)
+        self.rate_e=Entry(self.body_frame,font=main_font,width=15,bd=2,background=background,foreground=foreground)
+        self.rate_e.grid(row=3,column=1,pady=10,sticky=t.W)
         self.reg=self.rate_e.register(correct)                                # Input only Integer type
         self.rate_e.config(validate="key",validatecommand=(self.reg,"%P"))
         self.rate_e.bind("<Return>",lambda event: self.cat_combobox.focus())
         self.rate_e.bind("<Down>",lambda event: self.cat_combobox.focus())
         self.rate_e.bind("<Up>",lambda event: self.item_name_e.focus())
 
-        self.cat_combobox=ttk.Combobox(self.body_frame,width=15,font="consolas 18",state="readonly")
+        self.cat_combobox=ttk.Combobox(self.body_frame,width=15,font=main_font,state="readonly")
         self.cat_combobox["values"]=('Piece','Plate','Bottle','Siddique','Munna Bhaiya') 
         self.cat_combobox.option_add('*TCombobox*Listbox.font',("consolas",18))
-        self.cat_combobox.grid(row=4,column=1,pady=20,sticky=t.W) 
+        self.cat_combobox.grid(row=4,column=1,pady=10,sticky=t.W) 
         self.cat_combobox.current(0)
         self.cat_combobox.bind("<Return>",lambda event: self.save.focus())
         self.cat_combobox.bind("<Up>",lambda event: self.rate_e.focus())
 
-        self.save=Button(self.body_frame,text="Save",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background)
-        self.save.grid(row=5,column=0,padx=65,pady=20,sticky=t.W)
-        self.back=Button(self.body_frame,text="Back",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background,command=self.add_item_win.destroy)
-        self.back.grid(row=5,column=1,pady=20,padx=10,sticky=t.W)
+        self.add=Button(self.body_frame,text="Add",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background)
+        self.add.grid(row=5,column=0,padx=65,pady=10,sticky=t.W)
+        self.clear=Button(self.body_frame,text="Clear",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background)
+        self.clear.grid(row=5,column=1,pady=10,padx=10,sticky=t.W)
+        #---------------------Tree------------------------------
+        self.saved_item_frame=LabelFrame(self.frame_main,bg=background,text="Saved Items",font="calibri 45 bold",fg=foreground,bd=5)
+        self.saved_item_frame.grid(row=0,column=1,padx=20,pady=10)
+        self.database=[
+        ['r1','biryani','2542','plate'],
+        ['r2','biryanis','2542','plate'],
+        ['r3','biryadeni','2542','plate'],
+        ['r4','biryanie','2542','plate'],
+        ['r5','biryani','25542','plate'],
+        ['r6','biryani','25442','plate'],
+        ['r7','biryani','2442','plate'],
+        ['r3','biryadeni','2542','plate'],
+        ['r4','biryanie','2542','plate'],
+        ['r5','biryani','25542','plate'],
+        ['r6','biryani','25442','plate'],
+        ['r7','biryani','2442','plate']
+        ]
+        self.style=ttk.Style()
+        self.style.configure('mystyle.Treeview',highlightthickness=0,bd=0,font=('calibri',11))
+        self.style.configure('mystyle.Treeview.Heading',font=('calibri',14,'bold'))
+        self.style.layout('mystyle.Treeview',[('mystyle.Treeview.treearea',{'sticky':'nswe'})])
+        #scrollbar and treeview frame
+        self.tree_frame=Frame(self.saved_item_frame)
+        self.tree_frame.grid()
+        self.vertical_scrollbar=ttk.Scrollbar(self.tree_frame)
+        self.vertical_scrollbar.grid(row=0,column=1,sticky='ns')
+        self.data_tree=ttk.Treeview(self.tree_frame,style="mystyle.Treeview",yscrollcommand=self.vertical_scrollbar.set)
+        self.vertical_scrollbar.config(command=self.data_tree.yview)
+        #columns
+        self.data_tree['columns']=('0','1','2','3')
+        self.data_tree.column("#0",width=1)
+        self.data_tree.column("0",width=140)
+        self.data_tree.column("1",width=200)
+        self.data_tree.column("2",width=100)
+        self.data_tree.column("3",width=150)
+        #headings
+        self.data_tree.heading("0",text="Registration No",anchor=W)
+        self.data_tree.heading("1",text="Item Name",anchor=W)
+        self.data_tree.heading("2",text="Rate (INR)",anchor=W)
+        self.data_tree.heading("3",text='Category',anchor=W)
+        #insert data 
+        count=0
+        for record in self.database:
+            self.data_tree.insert(parent='',index='end',iid=count,values=(record[0],record[1],record[2],record[3]))
+            count+=1
+        self.data_tree.grid(row=0,column=0)
+        #buttons
+        self.delete=Button(self.saved_item_frame,text="Delete",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background)
+        self.delete.grid(row=2,column=0,pady=10,sticky=t.W,padx=50)
+        self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="consolas 16 bold",activebackground=background)
+        self.delete_all.grid(row=2,column=0,pady=10)
+
+
+
+
+
+
+
+
+        self.save=Button(self.frame_main,text="save changes",bg=background,fg=foreground,bd=2,font="consolas 16 bold",activebackground=background)
+        self.save.grid(row=3,column=1,sticky=t.W,pady=20)
+        self.back=Button(self.frame_main,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background)
+        self.back.grid(row=4,column=1,sticky=t.W,padx=50)
+
         self.add_item_win.bind("<Escape>",self.back_b)
         self.add_item_win.attributes('-toolwindow', True)
-        #self.add_item_win.mainloop()
+        self.add_item_win.mainloop()
     def back_b(self,event):
         self.add_item_win.destroy()
 class Settings:
