@@ -8,6 +8,7 @@ from tkinter import messagebox
 from csv import DictWriter,writer
 import csv,os
 import random
+import mysql.connector
 #-----------Functions-------------
 def correct(inp):
     if inp.isdigit():
@@ -30,6 +31,19 @@ def themes_data():
 data=themes_data()
 background=str(data[0])
 foreground=str(data[1])
+
+#------------Connection-------------
+if True:
+    mydb=mysql.connector.connect(
+        host='localhost',
+        username='root',
+        password='Password_mysql',
+        )
+my_cursor=mydb.cursor()
+my_cursor.execute('''create database if not exists Restaurant_db''')
+my_cursor.execute('''use Restaurant_db''')
+mydb.commit()
+
 #---------------------------------
 class Home:
     global background,foreground
@@ -45,6 +59,7 @@ class Home:
         self.banner_btn=Button(self.frame_banner,image=self.main_banner,bg=background,bd=0,activebackground=background,command=self.slideshow)
         #self.banner_btn.bind('<Button-1>',self.slideshow)
         self.banner_btn.grid(row=0,column=0)
+       
         #---------------Icons-------------------
         self.quick_bill_icon=ImageTk.PhotoImage(Image.open('icons\\billing.png'))
         self.inventory_icon=ImageTk.PhotoImage(Image.open('icons\\kitchen.png'))
@@ -290,7 +305,7 @@ class Add_Item:
         self.banner_lbl.grid(row=0,column=0)
         self.frame_main=Frame(self.add_item_win,bg=background)
         self.frame_main.grid(row=1,column=0)
-        main_font=Font(family="candara",size=18)
+        main_font=Font(family="candara",size=16,weight='normal')
         self.body_frame=LabelFrame(self.frame_main,bg=background,text="Item Discription",font="calibri 45 bold",fg=foreground,bd=5)
         self.body_frame.grid(row=0,column=0)
         self.regn_l=Label(self.body_frame,text="Reg. No *",font=main_font,bg=background,bd=1,fg=foreground)
@@ -331,77 +346,106 @@ class Add_Item:
         self.cat_combobox.bind("<Return>",lambda event: self.save.focus())
         self.cat_combobox.bind("<Up>",lambda event: self.rate_e.focus())
 
-        self.add=Button(self.body_frame,text="Add",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background)
+        self.add=Button(self.body_frame,text="Add",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background,command=self.Add_func)
         self.add.grid(row=5,column=0,padx=65,pady=10,sticky=t.W)
         self.clear=Button(self.body_frame,text="Clear",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background)
         self.clear.grid(row=5,column=1,pady=10,padx=10,sticky=t.W)
-        #---------------------Tree------------------------------
+        #-------Tree view style-----------------
         self.saved_item_frame=LabelFrame(self.frame_main,bg=background,text="Saved Items",font="calibri 45 bold",fg=foreground,bd=5)
         self.saved_item_frame.grid(row=0,column=1,padx=20,pady=10)
-        self.database=[
-        ['r1','biryani','2542','plate'],
-        ['r2','biryanis','2542','plate'],
-        ['r3','biryadeni','2542','plate'],
-        ['r4','biryanie','2542','plate'],
-        ['r5','biryani','25542','plate'],
-        ['r6','biryani','25442','plate'],
-        ['r7','biryani','2442','plate'],
-        ['r3','biryadeni','2542','plate'],
-        ['r4','biryanie','2542','plate'],
-        ['r5','biryani','25542','plate'],
-        ['r6','biryani','25442','plate'],
-        ['r7','biryani','2442','plate']
-        ]
         self.style=ttk.Style()
-        self.style.configure('mystyle.Treeview',highlightthickness=0,bd=0,font=('calibri',11))
-        self.style.configure('mystyle.Treeview.Heading',font=('calibri',14,'bold'))
+        self.style.configure('mystyle.Treeview',highlightthickness=0,bd=0,background=background,fielfbackground="blue",font=('candara',12))
+        self.style.configure('mystyle.Treeview.Heading',font=('candara',14,'bold'))
         self.style.layout('mystyle.Treeview',[('mystyle.Treeview.treearea',{'sticky':'nswe'})])
-        #scrollbar and treeview frame
+        #---------------scrollbar with treeview----
         self.tree_frame=Frame(self.saved_item_frame)
         self.tree_frame.grid()
         self.vertical_scrollbar=ttk.Scrollbar(self.tree_frame)
         self.vertical_scrollbar.grid(row=0,column=1,sticky='ns')
         self.data_tree=ttk.Treeview(self.tree_frame,style="mystyle.Treeview",yscrollcommand=self.vertical_scrollbar.set)
         self.vertical_scrollbar.config(command=self.data_tree.yview)
-        #columns
+        #-----Decorate headings and Columns------------
         self.data_tree['columns']=('0','1','2','3')
         self.data_tree.column("#0",width=1)
         self.data_tree.column("0",width=140)
         self.data_tree.column("1",width=200)
         self.data_tree.column("2",width=100)
         self.data_tree.column("3",width=150)
-        #headings
         self.data_tree.heading("0",text="Registration No",anchor=W)
         self.data_tree.heading("1",text="Item Name",anchor=W)
         self.data_tree.heading("2",text="Rate (INR)",anchor=W)
         self.data_tree.heading("3",text='Category',anchor=W)
-        #insert data 
-        count=0
-        for record in self.database:
-            self.data_tree.insert(parent='',index='end',iid=count,values=(record[0],record[1],record[2],record[3]))
-            count+=1
-        self.data_tree.grid(row=0,column=0)
-        #buttons
-        self.delete=Button(self.saved_item_frame,text="Delete",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background)
+        #---------insert data------------
+        self.insert_treeview() 
+        self.data_tree.grid(row=0,column=0)      
+        #------------buttons------------
+        self.delete=Button(self.saved_item_frame,text="Delete",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background,command=self.delete_func)
         self.delete.grid(row=2,column=0,pady=10,sticky=t.W,padx=50)
-        self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="consolas 16 bold",activebackground=background)
+        self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="consolas 16 bold",activebackground=background,command=self.delete_all_func)
         self.delete_all.grid(row=2,column=0,pady=10)
-
-
-
-
-
-
-
-
-        self.save=Button(self.frame_main,text="save changes",bg=background,fg=foreground,bd=2,font="consolas 16 bold",activebackground=background)
-        self.save.grid(row=3,column=1,sticky=t.W,pady=20)
-        self.back=Button(self.frame_main,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background)
+        self.back=Button(self.frame_main,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background,command=self.add_item_win.destroy)
         self.back.grid(row=4,column=1,sticky=t.W,padx=50)
-
         self.add_item_win.bind("<Escape>",self.back_b)
         self.add_item_win.attributes('-toolwindow', True)
         self.add_item_win.mainloop()
+    #----Add data in Database----
+    def Add_func(self):
+        my_cursor.execute(
+            '''CREATE TABLE IF NOT EXISTS 
+        Items_Record(
+            Regn_no varchar(255),
+            Item_name varchar(255),
+            Rate int,
+            Category varchar(255)
+            )'''
+        )
+        self.add_query='INSERT INTO Items_Record(Regn_no,Item_name,Rate,Category) VALUES(%s,%s,%s,%s)'
+        my_cursor.execute(self.add_query,
+        (self.regn_e.get(),self.item_name_e.get(),self.rate_e.get(),self.cat_combobox.get())
+        )
+        mydb.commit()
+        self.treeview_data()
+        self.item_name_e.delete(0,END)
+        self.rate_e.delete(0,END)
+    #-----Delete item from selection---
+    def delete_func(self):
+        self.delete_data=self.data_tree.item(self.data_tree.focus())['values']     # getting the list of selected area 
+        self.delete_query='DELETE FROM Items_Record WHERE Item_name=%s AND Rate=%s'
+        my_cursor.execute(self.delete_query,(self.delete_data[1],self.delete_data[2]))
+        mydb.commit()
+        self.treeview_data()
+    def delete_all_func(self):
+        my_cursor.execute('DROP TABLE Items_Record')
+        mydb.commit()
+        #clear the treeview
+        for child in self.data_tree.get_children():
+            self.data_tree.delete(child)
+        self.data_tree.insert("","end",text="",values=("","","",""))
+
+
+
+    #----insert treeview-----
+    def insert_treeview(self):
+        #Check table is exists or not
+        self.item_table = 'ITEMS_RECORD'
+        self.table_show_query = 'SHOW TABLES'
+        my_cursor.execute(self.table_show_query)
+        self.tables_list = my_cursor.fetchall()
+        self.results_list = [item[0] for item in self.tables_list] # Conversion to list of str
+        if self.item_table in str(self.results_list).upper():
+            self.treeview_data()     #table found then update treview data
+        else:
+            self.data_tree.insert("","end",text="",values=("","","",""))    #table not found then insert empty line
+    #----Udate treeview-------
+    def treeview_data(self):
+        # delete old data 
+        for child in self.data_tree.get_children():
+            self.data_tree.delete(child)
+        #input new data from database
+        my_cursor.execute('SELECT Regn_no,Item_name,Rate,Category FROM Items_Record')
+        self.results=my_cursor.fetchall()
+        for record in self.results:
+            self.data_tree.insert("","end",text="",values=(record[0],record[1],record[2],record[3]))
     def back_b(self,event):
         self.add_item_win.destroy()
 class Settings:
