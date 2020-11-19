@@ -43,7 +43,6 @@ my_cursor=mydb.cursor()
 my_cursor.execute('''create database if not exists Restaurant_db''')
 my_cursor.execute('''use Restaurant_db''')
 mydb.commit()
-
 #---------------------------------
 class Home:
     global background,foreground
@@ -57,9 +56,7 @@ class Home:
         self.banner_img=self.banner_img.resize((self.home_window.winfo_screenwidth(),150),Image.ANTIALIAS)
         self.main_banner=ImageTk.PhotoImage(self.banner_img)        
         self.banner_btn=Button(self.frame_banner,image=self.main_banner,bg=background,bd=0,activebackground=background,command=self.slideshow)
-        #self.banner_btn.bind('<Button-1>',self.slideshow)
         self.banner_btn.grid(row=0,column=0)
-       
         #---------------Icons-------------------
         self.quick_bill_icon=ImageTk.PhotoImage(Image.open('icons\\billing.png'))
         self.inventory_icon=ImageTk.PhotoImage(Image.open('icons\\kitchen.png'))
@@ -82,7 +79,6 @@ class Home:
         self.frame5.grid(row=1,column=1)
         self.frame6=Frame(self.body_frame,bg=background)
         self.frame6.grid(row=1,column=2)
-
         main_font=Font(family="candara",size=25,weight="bold")
         self.quick_bill=Button(self.frame1,text="Billing",image=self.quick_bill_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
         self.quick_bill.grid(row=0,column=0)
@@ -125,7 +121,6 @@ class Themes:
         self.themes_win=Toplevel()
         self.themes_win.title("Themes Menu")
         self.themes_win.geometry('400x400+450+200')
-        
         self.theme_label=Label(self.themes_win,text="Select your choice",font='helvetica 19 bold',fg='black',bg='white')
         self.theme_label.grid(row=0,column=0,padx=100,pady=20)
         self.values=('white','grey','lightgrey','blue')
@@ -158,13 +153,6 @@ class Themes:
             if messagebox.askyesno(parent=self.themes_win,title="Save Changes",message="would you like to restart to see changes"):
                 python = sys.executable
                 os.execl(python, python, * sys.argv)
-
-           
-
-                
-                
-        
-        
 class Inventory:
     def __init__(self):
         self.inventory_win=Toplevel()
@@ -189,13 +177,13 @@ class Inventory:
         self.inventory_win.focus_force()
         self.ban=Label(self.frame_banner,text="  INVENTORY ",font="Helvetica 40 bold",compound="left",bg=background,fg=foreground,image=self.inv_banner)
         self.ban.grid(row=1,column=0,pady=10)
-        self.add_item=Button(self.body_frame,text=" Items \n Registration ",font="Helvetica 20 bold",image=self.add_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.menu_page)
+        self.add_item=Button(self.body_frame,text=" Items \n Registration ",font="Helvetica 20 bold",image=self.add_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.add_item_func)
         self.add_item.grid(row=2,column=0,pady=10,sticky=t.W)
-        self.add_rawitem=Button(self.body_frame,text="  Raw Materials ",font="Helvetica 20 bold",image=self.raw_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
+        self.add_rawitem=Button(self.body_frame,text="  Raw Materials ",font="Helvetica 20 bold",image=self.raw_item_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
         self.add_rawitem.grid(row=3,column=0,pady=10,sticky=t.W)
-        self.employee=Button(self.body_frame,text="  Employee \n  Registeration ",font="Helvetica 20 bold",image=self.employee_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
+        self.employee=Button(self.body_frame,text="  Employee \n  Registeration ",font="Helvetica 20 bold",image=self.employee_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background,command=self.employee_reg_func)
         self.employee.grid(row=4,column=0,pady=10,sticky=t.W)
-        self.category=Button(self.body_frame,text="  Category \n  Registeration ",font="Helvetica 20 bold",image=self.category_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.raw_page)
+        self.category=Button(self.body_frame,text="  Category \n  Registeration ",font="Helvetica 20 bold",image=self.category_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background, command=self.category_reg_func)
         self.category.grid(row=1,column=0,pady=10,sticky=t.W)
         self.back=Button(self.body_frame,image=self.Exit_icon,compound="top",bg=background,fg=foreground,bd=0,activebackground=background,command=self.inventory_win.destroy)
         self.back.grid(row=5,column=0)
@@ -205,91 +193,14 @@ class Inventory:
         #self.inventory_win.mainloop()
     def destroy(self,event):
         self.inventory_win.destroy()
-    def menu_page(self):
-        menu_items()
-    def raw_page(self):
-        raw_items()
-class menu_items:
-    def __init__(self):
-        self.menu_win=Toplevel()
-        self.menu_win.title("Items Menu")
-        self.menu_win.state("zoomed")
-        self.menu_win.config(bg=background)
-        self.frame_banner=Frame(self.menu_win,bg=background)
-        self.frame_banner.grid(row=0,column=0)
-        self.banner_img=Image.open('icons\\home_ban.jpg')
-        self.banner_img=self.banner_img.resize((self.menu_win.winfo_screenwidth(),150),Image.ANTIALIAS)
-        self.main_banner=ImageTk.PhotoImage(self.banner_img)
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
-        self.banner_lbl.grid(row=0,column=0)
-
-        self.body_frame=Frame(self.menu_win,bg=background)
-        self.body_frame.grid(row=1,column=0,pady=15)
-        self.add_icon=ImageTk.PhotoImage(Image.open('icons\\add.png'))
-        self.edit_icon=ImageTk.PhotoImage(Image.open('icons\\edit.png'))
-        self.view_icon=ImageTk.PhotoImage(Image.open('icons\\view.png'))
-        self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
-        self.delete_icon=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
-        self.menu_banner_image=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
-        self.menu_ban=Label(self.body_frame,text=" ITEMS MENU",font="Helvetica 40 bold",image=self.menu_banner_image,compound="left",bd=0,bg=background,fg=foreground,activebackground=background)
-        self.menu_ban.grid(row=0,column=0,pady=15)
-        self.add_item=Button(self.body_frame,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background,command=self.Add_)
-        self.add_item.grid(row=1,column=0,pady=15)
-        self.edit_item=Button(self.body_frame,image=self.edit_icon,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.edit_item.grid(row=2,column=0,pady=15)
-        self.view_item=Button(self.body_frame,image=self.view_icon,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.view_item.grid(row=3,column=0,pady=15)
-        self.delete_item=Button(self.body_frame,image=self.delete_icon,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.delete_item.grid(row=4,column=0,pady=15)
-        self.back=Button(self.body_frame,image=self.back_icon,command=self.menu_win.destroy,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.back.grid(row=5,column=0,pady=15)
-        self.menu_win.bind("<Escape>",self.destroy_)
-        self.menu_win.attributes('-toolwindow', True)
-        #self.menu_win.mainloop()
-    def destroy_(self,event):
-        self.menu_win.destroy()
-    def Add_(self):
-        Add_Item()
-class raw_items:
-    def __init__(self):
-        self.raw_win=Toplevel()
-        self.raw_win.title("Raw Items Register")
-        self.raw_win.state("zoomed")
-        self.raw_win.config(bg=background)
-        self.frame_banner=Frame(self.raw_win,bg=background)
-        self.frame_banner.grid(row=0,column=0)
-        self.banner_img=Image.open('icons\\home_ban.jpg')
-        self.banner_img=self.banner_img.resize((self.raw_win.winfo_screenwidth(),150),Image.ANTIALIAS)
-        self.main_banner=ImageTk.PhotoImage(self.banner_img)
-        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
-        self.banner_lbl.grid(row=0,column=0)
-        self.body_frame=Frame(self.raw_win,bg=background)
-        self.body_frame.grid(row=1,column=0,pady=15)
-        self.add_icon=ImageTk.PhotoImage(Image.open('icons\\add.png'))
-        self.edit_icon=ImageTk.PhotoImage(Image.open('icons\\edit.png'))
-        self.view_icon=ImageTk.PhotoImage(Image.open('icons\\view.png'))
-        self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
-        self.delete_icon=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
-        self.menu_banner_image=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
-
-        self.menu_ban=Label(self.body_frame,text=" RAW MATERIALS",font="Helvetica 40 bold",image=self.menu_banner_image,compound="left",bd=0,bg=background,fg=foreground,activebackground=background)
-        self.menu_ban.grid(row=0,column=0,pady=15)
-        self.add_item=Button(self.body_frame,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.add_item.grid(row=1,column=0,pady=15)
-        self.edit_item=Button(self.body_frame,image=self.edit_icon,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.edit_item.grid(row=2,column=0,pady=15)
-        self.view_item=Button(self.body_frame,image=self.view_icon,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.view_item.grid(row=3,column=0,pady=15)
-        self.delete_item=Button(self.body_frame,image=self.delete_icon,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.delete_item.grid(row=4,column=0,pady=15)
-        self.back=Button(self.body_frame,image=self.back_icon,command=self.raw_win.destroy,bd=0,bg=background,fg=foreground,activebackground=background)
-        self.back.grid(row=5,column=0,pady=15)
-        self.raw_win.bind("<Escape>",self.destroy)
-        self.raw_win.attributes('-toolwindow', True)
-       #self.raw_win.mainloop()
-    def destroy(self,event):
-        self.raw_win.destroy()    
-class Add_Item:
+    def add_item_func(self):
+        Item_reg()
+    def category_reg_func(self):
+        #category_reg_win()
+        pass
+    def employee_reg_func(self):
+        Employee_reg()    
+class Item_reg:
     def __init__(self):
         self.add_item_win=Toplevel()
         self.add_item_win.title("Items Register")
@@ -306,31 +217,34 @@ class Add_Item:
         self.frame_main=Frame(self.add_item_win,bg=background)
         self.frame_main.grid(row=1,column=0)
         main_font=Font(family="candara",size=16,weight='normal')
-        self.body_frame=LabelFrame(self.frame_main,bg=background,text="Item Discription",font="calibri 45 bold",fg=foreground,bd=5)
-        self.body_frame.grid(row=0,column=0)
+        self.body_frame=LabelFrame(self.frame_main,bg=background,text="Item Description",font="calibri 35 bold",fg=foreground,bd=5)
+        self.body_frame.grid(row=0,column=0,ipadx=30)
         self.regn_l=Label(self.body_frame,text="Reg. No *",font=main_font,bg=background,bd=1,fg=foreground)
         self.regn_l.grid(row=1,column=0,pady=10,padx=20,sticky=t.W)
         self.item_name_l=Label(self.body_frame,text="Item Name *",font=main_font,bg=background,fg=foreground)
         self.item_name_l.grid(row=2,column=0,pady=10,padx=20,sticky=t.W)
         self.rate_l=Label(self.body_frame,text="Rate *",font=main_font,bg=background,fg=foreground)
         self.rate_l.grid(row=3,column=0,pady=10,padx=20,sticky=t.W)
-        self.cat_l=Label(self.body_frame,text="Unit *",font=main_font,bg=background,fg=foreground)
+        self.cat_l=Label(self.body_frame,text="Category",font=main_font,bg=background,fg=foreground)
         self.cat_l.grid(row=4,column=0,pady=10,padx=20,sticky=t.W)
         #-----------Entry boxes--------------------------
-        self.regn_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg=background,fg=foreground)
+        self.regn_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg='white',fg=foreground)
         self.regn_e.grid(row=1,column=1,pady=10,sticky=t.W)
+        #---------------registration no fetch------------------
+        self.regn_e.insert(END,'IT-01')
         self.regn_e.focus()
         self.regn_e.bind("<Return>",lambda event: self.item_name_e.focus())
         self.regn_e.bind("<Down>",lambda event: self.item_name_e.focus())
         self.regn_e.bind("<Up>",lambda event: self.cat_combobox.focus())
 
-        self.item_name_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg=background,fg=foreground)
+        self.item_name_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg='white',fg=foreground)
         self.item_name_e.grid(row=2,column=1,pady=10,sticky=t.W)
         self.item_name_e.bind("<Return>",lambda event: self.rate_e.focus())
         self.item_name_e.bind("<Down>",lambda event: self.rate_e.focus())
         self.item_name_e.bind("<Up>",lambda event: self.regn_e.focus())
 
-        self.rate_e=Entry(self.body_frame,font=main_font,width=15,bd=2,background=background,foreground=foreground)
+
+        self.rate_e=Entry(self.body_frame,font=main_font,width=15,bd=2,background='white',foreground=foreground)
         self.rate_e.grid(row=3,column=1,pady=10,sticky=t.W)
         self.reg=self.rate_e.register(correct)                                # Input only Integer type
         self.rate_e.config(validate="key",validatecommand=(self.reg,"%P"))
@@ -338,21 +252,21 @@ class Add_Item:
         self.rate_e.bind("<Down>",lambda event: self.cat_combobox.focus())
         self.rate_e.bind("<Up>",lambda event: self.item_name_e.focus())
 
-        self.cat_combobox=ttk.Combobox(self.body_frame,width=15,font=main_font,state="readonly")
+        self.cat_combobox=ttk.Combobox(self.body_frame,width=14,font=main_font,state="readonly")
         self.cat_combobox["values"]=('Piece','Plate','Bottle','Siddique','Munna Bhaiya') 
-        self.cat_combobox.option_add('*TCombobox*Listbox.font',("consolas",18))
-        self.cat_combobox.grid(row=4,column=1,pady=10,sticky=t.W) 
+        self.cat_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
+        self.cat_combobox.grid(row=4,column=1,pady=20,sticky=t.W) 
         self.cat_combobox.current(0)
-        self.cat_combobox.bind("<Return>",lambda event: self.save.focus())
+        self.cat_combobox.bind("<Return>",lambda event: self.Add_func())
         self.cat_combobox.bind("<Up>",lambda event: self.rate_e.focus())
 
         self.add=Button(self.body_frame,text="Add",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background,command=self.Add_func)
-        self.add.grid(row=5,column=0,padx=65,pady=10,sticky=t.W)
-        self.clear=Button(self.body_frame,text="Clear",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background)
-        self.clear.grid(row=5,column=1,pady=10,padx=10,sticky=t.W)
+        self.add.grid(row=5,column=0,padx=75,pady=10,sticky=t.W)
+        self.clear=Button(self.body_frame,text="Clear",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background,command=self.clear_func)
+        self.clear.grid(row=5,column=1,padx=20,pady=10,sticky=t.E)
         #-------Tree view style-----------------
-        self.saved_item_frame=LabelFrame(self.frame_main,bg=background,text="Saved Items",font="calibri 45 bold",fg=foreground,bd=5)
-        self.saved_item_frame.grid(row=0,column=1,padx=20,pady=10)
+        self.saved_item_frame=LabelFrame(self.frame_main,bg=background,text="Saved Items",font="candara 35 bold",fg=foreground,bd=5)
+        self.saved_item_frame.grid(row=0,column=1,padx=30,pady=30)
         self.style=ttk.Style()
         self.style.configure('mystyle.Treeview',highlightthickness=0,bd=0,background=background,fielfbackground="blue",font=('candara',12))
         self.style.configure('mystyle.Treeview.Heading',font=('candara',14,'bold'))
@@ -367,63 +281,78 @@ class Add_Item:
         #-----Decorate headings and Columns------------
         self.data_tree['columns']=('0','1','2','3')
         self.data_tree.column("#0",width=1)
-        self.data_tree.column("0",width=140)
+        self.data_tree.column("0",width=100)
         self.data_tree.column("1",width=200)
         self.data_tree.column("2",width=100)
         self.data_tree.column("3",width=150)
-        self.data_tree.heading("0",text="Registration No",anchor=W)
-        self.data_tree.heading("1",text="Item Name",anchor=W)
-        self.data_tree.heading("2",text="Rate (INR)",anchor=W)
-        self.data_tree.heading("3",text='Category',anchor=W)
+        self.data_tree.heading("0",text="Reg No")
+        self.data_tree.heading("1",text="Item Name")
+        self.data_tree.heading("2",text="Rate (INR)")
+        self.data_tree.heading("3",text='Category')
         #---------insert data------------
         self.insert_treeview() 
         self.data_tree.grid(row=0,column=0)      
         #------------buttons------------
-        self.delete=Button(self.saved_item_frame,text="Delete",bg=background,fg=foreground,bd=2,font="consolas 16 bold",width=8,activebackground=background,command=self.delete_func)
-        self.delete.grid(row=2,column=0,pady=10,sticky=t.W,padx=50)
-        self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="consolas 16 bold",activebackground=background,command=self.delete_all_func)
-        self.delete_all.grid(row=2,column=0,pady=10)
+        self.delete=Button(self.saved_item_frame,text="Delete",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background,command=self.delete_func)
+        self.delete.grid(row=2,column=0,pady=10,sticky=t.W,padx=150)
+        self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="candara 16 bold",activebackground=background,command=self.delete_all_func)
+        self.delete_all.grid(row=2,column=0,pady=10,sticky=t.E,padx=150)
         self.back=Button(self.frame_main,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background,command=self.add_item_win.destroy)
-        self.back.grid(row=4,column=1,sticky=t.W,padx=50)
+        self.back.grid(row=4,column=1,sticky=t.W,padx=40)
         self.add_item_win.bind("<Escape>",self.back_b)
         self.add_item_win.attributes('-toolwindow', True)
         self.add_item_win.mainloop()
     #----Add data in Database----
     def Add_func(self):
-        my_cursor.execute(
-            '''CREATE TABLE IF NOT EXISTS 
-        Items_Record(
-            Regn_no varchar(255),
-            Item_name varchar(255),
-            Rate int,
-            Category varchar(255)
-            )'''
-        )
-        self.add_query='INSERT INTO Items_Record(Regn_no,Item_name,Rate,Category) VALUES(%s,%s,%s,%s)'
-        my_cursor.execute(self.add_query,
-        (self.regn_e.get(),self.item_name_e.get(),self.rate_e.get(),self.cat_combobox.get())
-        )
-        mydb.commit()
-        self.treeview_data()
+        if self.rate_e.get() =="":
+            self.rate_e.focus()
+
+        if self.item_name_e.get() =="":
+            self.item_name_e.focus()
+
+        elif int(self.rate_e.get()) > 100000:
+            messagebox.showerror(parent=self.add_item_win,title='Error',message='Maximum Size Reached')
+            self.rate_e.delete(0,END)
+            self.rate_e.focus()
+        else:
+            my_cursor.execute(
+                '''CREATE TABLE IF NOT EXISTS 
+            Items_Record(
+                Regn_no varchar(255),
+                Item_name varchar(255),
+                Rate int,
+                Category varchar(255)
+                )'''
+            )
+            self.add_query='INSERT INTO Items_Record(Regn_no,Item_name,Rate,Category) VALUES(%s,%s,%s,%s)'
+            my_cursor.execute(self.add_query,
+            (self.regn_e.get(),self.item_name_e.get(),self.rate_e.get(),self.cat_combobox.get())
+            )
+            mydb.commit()
+            self.treeview_data()
+            self.clear_func()
+    def clear_func(self):
         self.item_name_e.delete(0,END)
         self.rate_e.delete(0,END)
+        self.regn_e.focus()
     #-----Delete item from selection---
     def delete_func(self):
-        self.delete_data=self.data_tree.item(self.data_tree.focus())['values']     # getting the list of selected area 
-        self.delete_query='DELETE FROM Items_Record WHERE Item_name=%s AND Rate=%s'
-        my_cursor.execute(self.delete_query,(self.delete_data[1],self.delete_data[2]))
-        mydb.commit()
-        self.treeview_data()
+        try:
+            self.delete_data=self.data_tree.item(self.data_tree.focus())['values']     # getting the list of selected area 
+            self.delete_query='DELETE FROM Items_Record WHERE Item_name=%s AND Rate=%s'
+            my_cursor.execute(self.delete_query,(self.delete_data[1],self.delete_data[2]))
+            mydb.commit()
+            self.treeview_data()
+        except:
+            messagebox.showerror(parent=self.add_item_win,title='Error',message="Please Select any Item")  
     def delete_all_func(self):
-        my_cursor.execute('DROP TABLE Items_Record')
-        mydb.commit()
+        if messagebox.askyesno(parent=self.add_item_win,title='Clear everything',message='Are you sure?'):
+            my_cursor.execute('DROP TABLE Items_Record')
+            mydb.commit()
         #clear the treeview
-        for child in self.data_tree.get_children():
-            self.data_tree.delete(child)
-        self.data_tree.insert("","end",text="",values=("","","",""))
-
-
-
+            for child in self.data_tree.get_children():
+                self.data_tree.delete(child)
+            self.data_tree.insert("","end",text="",values=("","","",""))
     #----insert treeview-----
     def insert_treeview(self):
         #Check table is exists or not
@@ -446,6 +375,7 @@ class Add_Item:
         self.results=my_cursor.fetchall()
         for record in self.results:
             self.data_tree.insert("","end",text="",values=(record[0],record[1],record[2],record[3]))
+
     def back_b(self,event):
         self.add_item_win.destroy()
 class Settings:
@@ -492,7 +422,245 @@ class Settings:
         Themes()
     def destroy(self,event):
         self.settings_win.destroy()
+class Employee_reg:
+    def __init__(self):
+        self.empl_reg_win=Toplevel()
+        self.empl_reg_win.title("Employee Registration")
+        self.empl_reg_win.state("zoomed")
+        self.empl_reg_win.config(bg=background)
+        self.frame_banner=Frame(self.empl_reg_win,bg=background)
+        self.frame_banner.grid(row=0,column=0)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
+        self.banner_img=self.banner_img.resize((self.empl_reg_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
+        self.banner_lbl.grid(row=0,column=0)
+        self.frame_main=Frame(self.empl_reg_win,bg=background)
+        self.frame_main.grid(row=1,column=0)
+        main_font=Font(family="candara",size=16,weight='normal')
+        self.body_frame=LabelFrame(self.frame_main,bg=background,text="Employee Registration",font="calibri 25 bold",fg=foreground,bd=5)
+        self.body_frame.grid(row=0,column=0,padx=20,pady=30)
+        self.id_l=Label(self.body_frame,text="Employee ID*",font=main_font,bg=background,bd=1,fg=foreground)
+        self.id_l.grid(row=1,column=0,pady=10,padx=20,sticky=t.W)
+        self.emp_name_l=Label(self.body_frame,text="Employee Name *",font=main_font,bg=background,fg=foreground)
+        self.emp_name_l.grid(row=2,column=0,pady=10,padx=20,sticky=t.W)
+        self.gender_l=Label(self.body_frame,text="Gender",font=main_font,bg=background,fg=foreground)
+        self.gender_l.grid(row=3,column=0,pady=10,padx=20,sticky=t.W)
+        self.mob_l=Label(self.body_frame,text="Mobile Number",font=main_font,bg=background,fg=foreground)
+        self.mob_l.grid(row=4,column=0,pady=10,padx=20,sticky=t.W)
+        self.address_l=Label(self.body_frame,text="Adress",font=main_font,bg=background,fg=foreground)
+        self.address_l.grid(row=5,column=0,pady=10,padx=20,sticky=t.W)
+        self.types_l=Label(self.body_frame,text="Type",font=main_font,bg=background,fg=foreground)
+        self.types_l.grid(row=6,column=0,pady=10,padx=20,sticky=t.W)
+        #-----------Entry boxes--------------------------
+        self.id_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg='white',fg=foreground)
+        self.id_e.grid(row=1,column=1,pady=10,sticky=t.W)
+        self.id_e.insert(END,'EM-01')
+        self.id_e.focus()
+        self.id_e.bind("<Return>",lambda event: self.emp_name_e.focus())
+        self.id_e.bind("<Down>",lambda event: self.emp_name_e.focus())
+        self.id_e.bind("<Up>",lambda event: self.gen_combobox.focus())
 
+        self.emp_name_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg='white',fg=foreground)
+        self.emp_name_e.grid(row=2,column=1,pady=10,sticky=t.W)
+        self.emp_name_e.bind("<Return>",lambda event: self.gen_combobox.focus())
+        self.emp_name_e.bind("<Down>",lambda event: self.gen_combobox.focus())
+        self.emp_name_e.bind("<Up>",lambda event: self.gen_combobox.focus())
+
+        self.gen_combobox=ttk.Combobox(self.body_frame,width=14,font=main_font,state="readonly")
+        self.gen_combobox["values"]=('Male','Female','Other') 
+        self.gen_combobox.option_add('*TCombobox*Listbox.font',('candara',16))
+        self.gen_combobox.grid(row=3,column=1,pady=10,sticky=t.W) 
+        self.gen_combobox.current(0)
+        self.gen_combobox.bind("<Return>",lambda event: self.mob_e.focus())
+        self.gen_combobox.bind("<Up>",lambda event: self.emp_name_e.focus())
+
+        self.mob_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg='white',fg=foreground)
+        self.mob_e.grid(row=4,column=1,pady=10,sticky=t.W)
+        self.reg=self.mob_e.register(correct)                                # Input only Integer type
+        self.mob_e.config(validate="key",validatecommand=(self.reg,"%P"))
+        self.mob_e.bind("<Return>",lambda event: self.address_e.focus())
+        self.mob_e.bind("<Down>",lambda event: self.address_e.focus())
+        self.mob_e.bind("<Up>",lambda event: self.gen_combobox.focus())
+
+        self.address_e=Entry(self.body_frame,font=main_font,width=15,bd=2,bg='white',fg=foreground)
+        self.address_e.grid(row=5,column=1,pady=10,sticky=t.W)
+        self.address_e.bind("<Return>",lambda event: self.types_combobox.focus())
+        self.address_e.bind("<Down>",lambda event: self.types_combobox.focus())
+        self.address_e.bind("<Up>",lambda event: self.mob_e.focus())
+
+        self.types_combobox=ttk.Combobox(self.body_frame,width=14,font=main_font,state="readonly")
+        self.types_combobox["values"]=('Waiter','Employee','Staff') 
+        self.types_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
+        self.types_combobox.grid(row=6,column=1,pady=10,sticky=t.W) 
+        self.types_combobox.current(0)
+        self.types_combobox.bind("<Return>",lambda event: self.Add_func())
+        self.types_combobox.bind("<Up>",lambda event: self.address_e.focus())
+
+        self.add=Button(self.body_frame,text="Add",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background,command=self.Add_func)
+        self.add.grid(row=8,column=0,padx=100,pady=10,sticky=t.W)
+        self.clear=Button(self.body_frame,text="Clear",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=8,activebackground=background,command=self.clear_func)
+        self.clear.grid(row=8,column=1,pady=10,padx=10,sticky=t.W)
+        #-------Tree view style-----------------
+        self.saved_item_frame=LabelFrame(self.frame_main,bg=background,text="Registered Employees",font="calibri 25 bold",fg=foreground,bd=5)
+        self.saved_item_frame.grid(row=0,column=1)
+        self.style=ttk.Style()
+        self.style.configure('mystyle.Treeview',highlightthickness=0,bd=0,background=background,fielfbackground="blue",font=('candara',12))
+        self.style.configure('mystyle.Treeview.Heading',font=('candara',14,'bold'))
+        self.style.layout('mystyle.Treeview',[('mystyle.Treeview.treearea',{'sticky':'nswe'})])
+        #---------------scrollbar with treeview----
+        self.tree_frame=Frame(self.saved_item_frame,bg=background)
+        self.tree_frame.grid()
+        self.vertical_scrollbar=ttk.Scrollbar(self.tree_frame)
+        self.vertical_scrollbar.grid(row=0,column=1,sticky='ns')
+        self.data_tree=ttk.Treeview(self.tree_frame,style="mystyle.Treeview",yscrollcommand=self.vertical_scrollbar.set)
+        self.vertical_scrollbar.config(command=self.data_tree.yview)
+
+        #-----Decorate headings and Columns------------
+        self.data_tree['columns']=('0','1','2','3','4','5')
+        self.data_tree.column("#0",width=1)
+        self.data_tree.column("0",width=50)
+        self.data_tree.column("1",width=150,anchor='center')
+        self.data_tree.column("2",width=70)
+        self.data_tree.column("3",width=150,anchor='center')
+        self.data_tree.column("4",width=150)
+        self.data_tree.column("5",width=100)
+        self.data_tree.heading("0",text="ID")
+        self.data_tree.heading("1",text="Name")
+        self.data_tree.heading("2",text="Gender")
+        self.data_tree.heading("3",text='Mobile No.')
+        self.data_tree.heading("4",text='Address')
+        self.data_tree.heading("5",text='Type')
+        #---------insert data------------
+        self.insert_treeview() 
+        self.data_tree.grid(row=0,column=0,pady=45)      
+        #------------buttons------------
+        self.buttons_frame=Frame(self.saved_item_frame,bg=background)
+        self.buttons_frame.grid(row=2,column=0,pady=10)
+        self.delete=Button(self.buttons_frame,text="Delete",bg=background,fg=foreground,bd=2,font="candara 16 bold",activebackground=background,command=self.delete_func)
+        self.delete.grid(row=0,column=0,padx=15)
+        self.delete_all=Button(self.buttons_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="candara 16 bold",activebackground=background,command=self.delete_all_func)
+        self.delete_all.grid(row=0,column=1,padx=30)
+        self.back=Button(self.frame_main,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background,command=self.empl_reg_win.destroy)
+        self.back.grid(row=9,column=1,sticky=t.W,padx=20)
+        self.empl_reg_win.bind("<Escape>",self.back_b)
+        self.empl_reg_win.attributes('-toolwindow', True)
+        self.empl_reg_win.mainloop()
+    #----Add data in Database----
+    def Add_func(self):
+        if str(self.mob_e.get())=="":
+                self.mob_e.focus()
+        if self.emp_name_e.get()=="":
+            self.emp_name_e.focus()
+        if len(str(self.mob_e.get())) > 10 or len(str(self.mob_e.get())) < 10:
+            messagebox.showerror(parent=self.empl_reg_win,title='Error',message='Mobile No Should Be in 10 Digits')
+            self.mob_e.focus()
+        else:
+            my_cursor.execute(
+                '''CREATE TABLE IF NOT EXISTS 
+            Employees_Record(
+                Empl_id varchar(255),
+                Empl_name varchar(255),
+                Empl_gender varchar(255),
+                Empl_number varchar(255),
+                Empl_address varchar(255),
+                Empl_type varchar(255)
+                )'''
+            )
+            self.add_query='INSERT INTO Employees_Record(Empl_id,Empl_name,Empl_gender,Empl_number,Empl_address,Empl_type) VALUES(%s,%s,%s,%s,%s,%s)'
+            my_cursor.execute(self.add_query,
+            (self.id_e.get(),self.emp_name_e.get(),self.gen_combobox.get(),str(self.mob_e.get()),self.address_e.get(),self.types_combobox.get())
+            )
+            mydb.commit()
+            self.treeview_data()
+            self.clear_func()
+    def clear_func(self):
+        self.emp_name_e.delete(0,END)
+        self.mob_e.delete(0,END)
+        self.address_e.delete(0,END)
+        self.id_e.focus()
+
+    #-----Delete item from selection---
+    def delete_func(self):
+        try:
+            self.delete_data=self.data_tree.item(self.data_tree.focus())['values']     # getting the list of selected area 
+            self.delete_query='DELETE FROM Employees_Record WHERE Empl_id=%s AND Empl_name=%s'
+            my_cursor.execute(self.delete_query,(self.delete_data[0],self.delete_data[1]))
+            mydb.commit()
+            self.treeview_data()
+        except:
+            messagebox.showerror(parent=self.empl_reg_win,title='Error',message="Please Select any Item")  
+    def delete_all_func(self):
+        if messagebox.askyesno(parent=self.empl_reg_win,title='Clear everything',message='Are you sure?'):
+            my_cursor.execute('DROP TABLE Employees_Record')
+            mydb.commit()
+        #clear the treeview
+            for child in self.data_tree.get_children():
+                self.data_tree.delete(child)
+            self.data_tree.insert("","end",text="",values=("","","","","",""))
+    #----insert treeview-----
+    def insert_treeview(self):
+        #Check table is exists or not
+        self.item_table = 'EMPLOYEES_RECORD'
+        self.table_show_query = 'SHOW TABLES'
+        my_cursor.execute(self.table_show_query)
+        self.tables_list = my_cursor.fetchall()
+        self.results_list = [item[0] for item in self.tables_list] # Conversion to list of str
+        if self.item_table in str(self.results_list).upper():
+            self.treeview_data()     #table found then update treview data
+        else:
+            self.data_tree.insert("","end",text="",values=("","","","","",""))    #table not found then insert empty line
+    #----Udate treeview-------
+    def treeview_data(self):
+        # delete old data 
+        for child in self.data_tree.get_children():
+            self.data_tree.delete(child)
+        #input new data from database
+        my_cursor.execute('SELECT Empl_id,Empl_name,Empl_gender,Empl_number,Empl_address,Empl_type FROM Employees_Record')
+        self.results=my_cursor.fetchall()
+        for record in self.results:
+            self.data_tree.insert("","end",text="",values=(record[0],record[1],record[2],record[3],record[4],record[5]))
+    def back_b(self,event):
+        self.empl_reg_win.destroy()
+class raw_items:
+    def __init__(self):
+        self.raw_win=Toplevel()
+        self.raw_win.title("Raw Items Register")
+        self.raw_win.state("zoomed")
+        self.raw_win.config(bg=background)
+        self.frame_banner=Frame(self.raw_win,bg=background)
+        self.frame_banner.grid(row=0,column=0)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.raw_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
+        self.banner_lbl.grid(row=0,column=0)
+        self.body_frame=Frame(self.raw_win,bg=background)
+        self.body_frame.grid(row=1,column=0,pady=15)
+        self.add_icon=ImageTk.PhotoImage(Image.open('icons\\add.png'))
+        self.edit_icon=ImageTk.PhotoImage(Image.open('icons\\edit.png'))
+        self.view_icon=ImageTk.PhotoImage(Image.open('icons\\view.png'))
+        self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
+        self.delete_icon=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
+        self.menu_banner_image=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
+        self.menu_ban=Label(self.body_frame,text=" RAW MATERIALS",font="Helvetica 40 bold",image=self.menu_banner_image,compound="left",bd=0,bg=background,fg=foreground,activebackground=background)
+        self.menu_ban.grid(row=0,column=0,pady=15)
+        self.add_item=Button(self.body_frame,image=self.add_icon,bd=0,bg=background,fg=foreground,activebackground=background)
+        self.add_item.grid(row=1,column=0,pady=15)
+        self.edit_item=Button(self.body_frame,image=self.edit_icon,bd=0,bg=background,fg=foreground,activebackground=background)
+        self.edit_item.grid(row=2,column=0,pady=15)
+        self.view_item=Button(self.body_frame,image=self.view_icon,bd=0,bg=background,fg=foreground,activebackground=background)
+        self.view_item.grid(row=3,column=0,pady=15)
+        self.delete_item=Button(self.body_frame,image=self.delete_icon,bd=0,bg=background,fg=foreground,activebackground=background)
+        self.delete_item.grid(row=4,column=0,pady=15)
+        self.back=Button(self.body_frame,image=self.back_icon,command=self.raw_win.destroy,bd=0,bg=background,fg=foreground,activebackground=background)
+        self.back.grid(row=5,column=0,pady=15)
+        self.raw_win.bind("<Escape>",self.destroy)
+        self.raw_win.attributes('-toolwindow', True)
+       #self.raw_win.mainloop()
+    def destroy(self,event):
+        self.raw_win.destroy()    
 if __name__ == "__main__":
     Home()
    
