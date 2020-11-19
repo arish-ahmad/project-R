@@ -80,7 +80,7 @@ class Home:
         self.frame6=Frame(self.body_frame,bg=background)
         self.frame6.grid(row=1,column=2)
         main_font=Font(family="candara",size=25,weight="bold")
-        self.quick_bill=Button(self.frame1,text="Billing",image=self.quick_bill_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
+        self.quick_bill=Button(self.frame1,text="Billing",image=self.quick_bill_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font,command=self.billing_func)
         self.quick_bill.grid(row=0,column=0)
         self.items=Button(self.frame2,text="Inventory",image=self.inventory_icon,bd=0,bg=background,fg=foreground,activebackground=background,command=self.inv_page,compound="top",font=main_font)
         self.items.grid(row=0,column=0)
@@ -110,6 +110,8 @@ class Home:
         Inventory()
     def setting_page(self):
         Settings()
+    def billing_func(self):
+        BILLING()
     def exit(self):
         if messagebox.askyesno(parent=self.home_window,title="Exit",message="Are You Sure!"):
             self.home_window.destroy()
@@ -660,7 +662,71 @@ class raw_items:
         self.raw_win.attributes('-toolwindow', True)
        #self.raw_win.mainloop()
     def destroy(self,event):
-        self.raw_win.destroy()    
+        self.raw_win.destroy()  
+
+#_____________________________________________BILLING___________________________________________________________________
+class BILLING:
+    def __init__(self):
+        self.billing_win=Toplevel()
+        self.billing_win.state('zoomed')
+        self.billing_win.config(bg=background)
+        self.frame_banner=Frame(self.billing_win,bg=background)
+        self.frame_banner.grid(row=0,column=0)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.billing_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
+        self.kot_icon=ImageTk.PhotoImage(Image.open('icons\\kot_ico.png'))
+        self.pos_icon=ImageTk.PhotoImage(Image.open('icons\\pos_ico.png'))
+        self.paymnet_icon=ImageTk.PhotoImage(Image.open('icons\\payment_ico.png'))
+        self.invoice_setting_icon=ImageTk.PhotoImage(Image.open('icons\\invoice_setting_ico.png'))
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
+        self.banner_lbl.grid(row=0,column=0)
+        self.body_frame=Frame(self.billing_win,bg=background)
+        self.body_frame.grid(row=1,column=0) 
+        self.frame1=Frame(self.body_frame,bg=background)
+        self.frame1.grid(row=0,column=0,sticky=t.W,pady=60,padx=70)
+        self.frame2=Frame(self.body_frame,bg=background)
+        self.frame2.grid(row=0,column=2,padx=50)
+        self.frame3=Frame(self.body_frame,bg=background)
+        self.frame3.grid(row=1,column=0,sticky=t.W,padx=50)
+        self.frame4=Frame(self.body_frame,bg=background)
+        self.frame4.grid(row=1, column=2,padx=50)
+        self.billing_font=Font(family="candara",size=20,weight="bold")
+        self.kot_b=Button(self.frame1,text='KOT',image=self.kot_icon,bg=background,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top',command=self.kot_func)
+        self.kot_b.grid()
+        self.pos_b=Button(self.frame2,text='POS',bg=background,image=self.pos_icon,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top')
+        self.pos_b.grid()
+        self.payment_b=Button(self.frame3,text='Payment',image=self.paymnet_icon,bg=background,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top')
+        self.payment_b.grid()
+        self.invoice_setting_b=Button(self.frame4,text='Invoice setting',image=self.invoice_setting_icon,bg=background,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top')
+        self.invoice_setting_b.grid()
+        self.back_b=Button(self.body_frame,image=self.Exit_icon,bg=background,fg=foreground,bd=0,font=self.billing_font,activebackground=background,command=self.billing_win.destroy)
+        self.back_b.grid(row=2,column=1,pady=20)
+        self.billing_win.bind("<Escape>",lambda event: self.billing_win.destroy())
+        self.billing_win.resizable(0,0)
+        self.billing_win.attributes('-toolwindow', True)
+    def kot_func(self):
+        KOT()
+class KOT:
+    def __init__(self):
+        self.kot_win=Toplevel()
+        self.kot_win.state('zoomed')
+        self.kot_win.config(bg=background)
+        self.frame_banner=Frame(self.kot_win,bg=background)
+        self.frame_banner.grid(row=0,column=0)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.kot_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
+        self.banner_lbl.grid(row=0,column=0)
+        self.body_frame=Frame(self.kot_win,bg=background)
+        self.body_frame.grid(row=1,column=0)
+        self.kot_win.bind("<Escape>",lambda event: self.kot_win.destroy())
+        self.kot_win.resizable(0,0)
+        self.kot_win.attributes('-toolwindow', True)
+  
 if __name__ == "__main__":
     Home()
    
