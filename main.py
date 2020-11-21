@@ -422,7 +422,185 @@ class Settings:
     def destroy(self,event):
         self.settings_win.destroy()
        
+class category_reg_win:
+    def __init__(self):
+        self.menu_win=Toplevel()
+        self.menu_win.title("Category Registration")
+        self.menu_win.geometry('400x530+550+150')
+        self.menu_win.config(bg=background)
+        self.back_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
 
+        self.main_frame=Frame(self.menu_win,bg=background)
+        self.main_frame.grid(row=0,column=0,pady=5)
+        self.body_frame=Frame(self.menu_win,bg=background)
+        self.body_frame.grid(row=1,column=0)
+        # self.banner_img=Image.open('icons\\home_ban.jpg')
+        # self.banner_img=self.banner_img.resize((self.menu_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        # self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        # self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
+        # self.banner_lbl.grid(row=0,column=0)
+
+        # self.frame_main=Frame(self.menu_win,bg=background)
+        # self.frame_main.grid(row=1,column=0,pady=10)
+        main_font=Font(family="candara",size=14,weight='normal')
+        
+        self.lbl=Label(self.main_frame,text='Category Registration',font='candara 30 bold',bg=background,fg=foreground)
+        self.lbl.grid(row=0,column=0)
+        self.regno_l=Label(self.body_frame,text="Regristration No. *",font=main_font,bg=background,bd=1,fg=foreground)
+        self.regno_l.grid(row=1,column=0,pady=10,padx=10,sticky=t.W)
+        self.reg_e=Entry(self.body_frame,font=main_font,width=14,bd=2,bg='white',fg=foreground)
+        self.reg_e.grid(row=1,column=1,pady=10,padx=2,sticky=t.W)
+        self.reg_e.bind("<Return>",lambda event: self.unit_combobox.focus())
+        self.reg_e.bind("<Down>",lambda event: self.unit_combobox.focus())
+        
+
+        self.unit_l=Label(self.body_frame,text="Unit *",font=main_font,bg=background,bd=1,fg=foreground)
+        self.unit_l.grid(row=2,column=0,pady=10,padx=10,sticky=t.W)
+        self.unit_combobox=ttk.Combobox(self.body_frame,width=13,font=main_font)
+        self.unit_combobox["values"]=('Piece','Plate','Bottle','Cup','Kilogram') 
+        self.unit_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
+        self.unit_combobox.grid(row=2,column=1,pady=10,padx=5,sticky=t.W)
+        self.unit_combobox.current(0) 
+
+        self.add=Button(self.body_frame,text="Add",bg=background,fg=foreground,bd=2,font="candara 12 bold",width=5,activebackground=background,command=self.Add_func)
+        self.add.grid(row=3,column=0,columnspan=2,padx=170,pady=10,sticky=t.W)
+        # self.clear=Button(self.body_frame,text="Clear",bg=background,fg=foreground,bd=2,font="candara 16 bold",width=6,activebackground=background)
+        # self.clear.grid(row=3,column=1,pady=10,padx=50,sticky=t.E)
+
+        self.saved_item_frame=LabelFrame(self.body_frame,bg=background,font="candara 20",fg=foreground,bd=0)
+        self.saved_item_frame.grid(row=4,column=0,padx=20,pady=10,columnspan=2)
+        self.style=ttk.Style()
+        
+        self.style.configure('mystyle.Treeview',highlightthickness=0,bd=0,background=background,fieldfbackground=background,foreground=foreground,font=('candara',12))
+        self.style.configure('mystyle.Treeview.Heading',font=('candara',14,'bold'))
+        self.style.layout('mystyle.Treeview',[('mystyle.Treeview.treearea',{'sticky':'nswe'})])
+
+        self.tree_frame=Frame(self.saved_item_frame)
+        self.tree_frame.grid()
+        self.vertical_scrollbar=ttk.Scrollbar(self.tree_frame)
+        self.vertical_scrollbar.grid(row=0,column=1,sticky='ns')
+        self.data_tree=ttk.Treeview(self.tree_frame,style="mystyle.Treeview",yscrollcommand=self.vertical_scrollbar.set)
+        self.vertical_scrollbar.config(command=self.data_tree.yview)
+
+        self.data_tree['columns']=('0','1')
+        self.data_tree.column("#0",width=0)
+        self.data_tree.column("0",width=100)
+        self.data_tree.column("1",width=200)
+        
+        self.data_tree.heading("0",text="Reg No",anchor=t.W)
+        self.data_tree.heading("1",text="Units",anchor=t.W)
+        
+        #---------insert data------------
+        self.insert_treeview() 
+        self.data_tree.grid(row=0,column=0)      
+        #------------buttons------------
+        self.delete=Button(self.saved_item_frame,text="Delete",bg=background,fg=foreground,bd=2,font="candara 12 bold",width=8,activebackground=background,command=self.delete_func)
+        self.delete.grid(row=2,column=0,pady=10,sticky=t.W,padx=10)
+        self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="candara 12 bold",activebackground=background,command=self.delete_all_func)
+        self.delete_all.grid(row=2,column=0,pady=10,sticky=t.E,padx=10)
+        # self.back=Button(self.saevd_item_frame,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background,command=self.menu_win.destroy)
+        # self.back.grid(row=4,column=1,sticky=t.W,padx=50)
+        self.menu_win.bind("<Escape>",self.back_b)
+        
+        self.menu_win.resizable(0,0)
+        
+        self.menu_win.attributes('-toolwindow', True)
+        self.menu_win.mainloop()
+        
+    #----Add data in Database----
+    def Add_func(self):
+        my_cursor.execute(
+            '''CREATE TABLE IF NOT EXISTS 
+        Category_Record(
+            Regn_no varchar(255),
+            Unit_name varchar(255)
+            )'''
+        )
+        self.add_query='INSERT INTO Category_Record(Regn_no,Unit_name) VALUES(%s,%s)'
+        my_cursor.execute(self.add_query,
+        (self.reg_e.get(),self.unit_combobox.get())
+        )
+        mydb.commit()
+        self.treeview_data()
+        self.reg_e.delete(0,END)
+        self.unit_combobox.delete(0,END)
+    #-----Delete item from selection---
+    def insert_treeview(self):
+        #Check table is exists or not
+        self.item_table = 'CATEGORY_RECORD'
+        self.table_show_query = 'SHOW TABLES'
+        my_cursor.execute(self.table_show_query)
+        self.tables_list = my_cursor.fetchall()
+        self.results_list = [item[0] for item in self.tables_list] # Conversion to list of str
+        if self.item_table in str(self.results_list).upper():
+            self.treeview_data()     #table found then update treview data
+        else:
+            self.data_tree.insert("","end",text="",values=("",""))    #table not found then insert empty line
+    #----Udate treeview-------
+    def treeview_data(self):
+        # delete old data 
+        for child in self.data_tree.get_children():
+            self.data_tree.delete(child)
+        #input new data from database
+        my_cursor.execute('SELECT Regn_no,Unit_name from Category_Record')
+        self.results=my_cursor.fetchall()
+        for record in self.results:
+            self.data_tree.insert("","end",text="",values=(record[0],record[1]))
+    def back_b(self,event):
+        self.category_reg_win.destroy()
+
+    def delete_func(self):
+        try:
+            self.delete_data=self.data_tree.item(self.data_tree.focus())['values']     # getting the list of selected area 
+            self.delete_query='DELETE FROM Category_Record WHERE Regn_no=%s AND Unit_name=%s'
+            my_cursor.execute(self.delete_query,(self.delete_data[0],self.delete_data[1]))
+            mydb.commit()
+            self.treeview_data()
+
+        except:
+            messagebox.showerror(parent=self.menu_win,title='Error',message="Please Select any Item")  
+    def delete_all_func(self):
+        if messagebox.askyesno(parent=self.menu_win,title='Clear everything',message='Are you sure?'):
+            my_cursor.execute('DROP TABLE Category_Record')
+            mydb.commit()
+        #clear the treeview
+            for child in self.data_tree.get_children():
+                self.data_tree.delete(child)
+            self.data_tree.insert("","end",text="",values=("",""))
+
+            my_cursor.execute('SELECT Regn_no,Unit_name from Category_Record')
+            self.results=my_cursor.fetchall()
+            for record in self.results:
+                self.data_tree.insert("","end",text="",values=(record[0],record[1]))
+    def back_b(self,event):
+        self.category_reg_win.destroy()
+
+
+        # self.unit_combobox.current(0)
+        # var = IntVar()
+        # self.c=Checkbutton(self.body_frame, text='Plate',variable=var)
+        # self.c.grid(row=1,column=1)
+        # self.c=Checkbutton(self.body_frame, text='Piece',variable=var)
+        # self.c.grid(row=2,column=1)
+        # self.c=Checkbutton(self.body_frame, text='Bottle',variable=var)
+        # self.c.grid(row=3,column=1)
+        # self.c=Checkbutton(self.body_frame, text='Per KG',variable=var)
+        # self.c.grid(row=4,column=1)
+        # self.b=Button(self.body_frame,text='click',command=self.cl)
+        # self.b.grid(row=5,column=1)
+        # self.item_name_l=Label(self.body_frame,text="Item Name *",font=main_font,bg=background,fg=foreground)
+        # self.item_name_l.grid(row=2,column=0,pady=10,padx=20,sticky=t.W)
+        # self.rate_l=Label(self.body_frame,text="Rate *",font=main_font,bg=background,fg=foreground)
+        # self.rate_l.grid(row=3,column=0,pady=10,padx=20,sticky=t.W)
+        # self.cat_l=Label(self.body_frame,text="Unit *",font=main_font,bg=background,fg=foreground)
+        # self.cat_l.grid(row=4,column=0,pady=10,padx=20,sticky=t.W)
+    
+        
+
+      
+    def destroy_(self,event):
+        self.menu_win.destroy()
+    
 
 class Employee_reg:
     def __init__(self):
@@ -551,7 +729,7 @@ class Employee_reg:
         self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="candara 16 bold",activebackground=background,command=self.delete_all_func)
         self.delete_all.grid(row=2,column=0,columnspan=2,sticky=t.E,padx=280)
         self.back=Button(self.frame_main,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background,command=self.empl_reg_win.destroy)
-        self.back.grid(row=9,column=1,sticky=t.W,padx=150)
+        self.back.grid(row=9,column=1,sticky=t.W,padx=100)
         self.empl_reg_win.bind("<Escape>",self.back_b)
         self.empl_reg_win.attributes('-toolwindow', True)
         self.empl_reg_win.mainloop()
