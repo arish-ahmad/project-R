@@ -86,7 +86,7 @@ class Home:
         self.items.grid(row=0,column=0)
         self.takesaway=Button(self.frame3,text="Takesaway",image=self.takeaway_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
         self.takesaway.grid(row=0,column=0)
-        self.report=Button(self.frame4,text="Report",image=self.reports_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font)
+        self.report=Button(self.frame4,text="Report",image=self.reports_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font,command=self.report_window)
         self.report.grid(row=0,column=0)
         self.settings=Button(self.frame5,text="Settings",image=self.setting_icon,bd=0,bg=background,fg=foreground,activebackground=background,compound="top",font=main_font,command=self.setting_page)
         self.settings.grid(row=0,column=0)
@@ -112,6 +112,8 @@ class Home:
         Settings()
     def billing_func(self):
         BILLING()
+    def report_window(self):
+        Report()    
     def exit(self):
         if messagebox.askyesno(parent=self.home_window,title="Exit",message="Are You Sure!"):
             self.home_window.destroy()
@@ -402,25 +404,25 @@ class Settings:
         self.help_img=ImageTk.PhotoImage(Image.open('icons\\help.png'))
         self.about_img=ImageTk.PhotoImage(Image.open('icons\\about.png'))
         self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
-        self.inv_banner=ImageTk.PhotoImage(Image.open('icons\\menu_ico.png'))
+        self.inv_banner=ImageTk.PhotoImage(Image.open('icons\\settings_ico.png'))
         self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
         self.banner_lbl.grid(row=0,column=0)
         self.body_frame=Frame(self.settings_win,bg=background)
-        self.body_frame.grid(row=1,column=0)
-        self.ban=Label(self.frame_banner,text=" Settings and customization ",font="Helvetica 40 bold",compound="left",bg=background,fg=foreground,image=self.inv_banner)
+        self.body_frame.grid(row=1,column=0,pady=20)
+        self.ban=Label(self.frame_banner,text="  SETTINGS ",font="Candara 40 bold",compound="left",bg=background,fg=foreground,image=self.inv_banner)
         self.ban.grid(row=1,column=0)
         self.cd=Button(self.body_frame,text="  Company Details ",font="Helvetica 20 bold",image=self.cd_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
-        self.cd.grid(row=1,column=0,pady=10,sticky=t.W)
+        self.cd.grid(row=1,column=1,pady=15,padx=30,sticky=t.W)
         self.printer_b=Button(self.body_frame,text="  Add Printer ",font="Helvetica 20 bold",image=self.printer_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
-        self.printer_b.grid(row=2,column=0,pady=10,sticky=t.W)
+        self.printer_b.grid(row=1,column=0,pady=15,padx=10,sticky=t.W)
         self.theme_b=Button(self.body_frame,text="  Change Theme ",font="Helvetica 20 bold",image=self.theme_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background,command=self.theme_page)
-        self.theme_b.grid(row=3,column=0,pady=10,sticky=t.W)
+        self.theme_b.grid(row=2,column=0,pady=15,padx=10,sticky=t.W)
         self.help=Button(self.body_frame,text="  Help ",font="Helvetica 20 bold",image=self.help_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
-        self.help.grid(row=4,column=0,pady=10,sticky=t.W)
+        self.help.grid(row=2,column=1,pady=15,padx=30,sticky=t.W)
         self.about=Button(self.body_frame,text="  About Us ",font="Helvetica 20 bold",image=self.about_img,compound="left",bg=background,fg=foreground,bd=0,activebackground=background)
-        self.about.grid(row=5,column=0,pady=10,sticky=t.W)
+        self.about.grid(row=3,column=0,pady=15,padx=10,sticky=t.W)
         self.back=Button(self.body_frame,image=self.Exit_icon,compound="top",bg=background,fg=foreground,bd=0,activebackground=background,command=self.settings_win.destroy)
-        self.back.grid(row=6,column=0)
+        self.back.grid(row=4,column=1,sticky=t.W,pady=20)
         self.settings_win.bind("<Escape>",self.destroy)
         self.settings_win.resizable(0,0)
         self.settings_win.attributes('-toolwindow', True)
@@ -662,6 +664,7 @@ class category_reg_win:
         self.add.grid(row=3,column=0)
         self.delete=Button(self.body_frame,text="Delete",bg=background,fg=foreground,bd=2,font="candara 12 bold",width=8,activebackground=background,command=self.delete_func)
         self.delete.grid(row=3,column=1,sticky=t.W,padx=20)
+        
         self.saved_item_frame=LabelFrame(self.body_frame,bg=background,font="candara 20",fg=foreground,bd=0)
         self.saved_item_frame.grid(row=4,column=0,padx=50,pady=10,columnspan=2)
         self.style=ttk.Style()  
@@ -683,8 +686,10 @@ class category_reg_win:
         #---------insert data------------
         self.insert_treeview() 
         self.data_tree.grid(row=0,column=0)      
-        self.back=Button(self.saved_item_frame,image=self.back_icon,bg=background,fg=foreground,bd=0,activebackground=background,command=self.menu_win.destroy)
-        self.back.grid(row=1,column=0,pady=10)
+        self.back=Button(self.saved_item_frame,text='Back',font='candara 12 bold',bd=2,width=5,bg=background,fg=foreground,activebackground=background,command=self.menu_win.destroy)
+        self.back.grid(row=1,column=0,pady=10,sticky=t.W,padx=40)
+        self.delete_all=Button(self.saved_item_frame,text="Delete all",width=10,bg=background,fg=foreground,bd=2,font="candara 12 bold",activebackground=background,command=self.delete_all_func)
+        self.delete_all.grid(row=1,column=0,padx=40,sticky=t.E)
         self.menu_win.bind("<Escape>",self.back_b)
         self.menu_win.focus()
         self.menu_win.resizable(0,0)
@@ -738,7 +743,17 @@ class category_reg_win:
             mydb.commit()
             self.treeview_data()
         except:
-            messagebox.showerror(parent=self.menu_win,title='Error',message="Please Select any Item")  
+            messagebox.showerror(parent=self.menu_win,title='Error',message="Please Select any Item") 
+
+    def delete_all_func(self):
+        if messagebox.askyesno(parent=self.menu_win,title='Clear everything',message='Are you sure?'):
+            my_cursor.execute('DROP TABLE Category_Record')
+            mydb.commit()
+        #clear the treeview
+            for child in self.data_tree.get_children():
+                self.data_tree.delete(child)
+            self.data_tree.insert("","end",text="",values=("",""))
+    #----insert treeview-----         
 class raw_items:
     def __init__(self):
         self.raw_win=Toplevel()
@@ -840,7 +855,40 @@ class KOT:
         self.kot_win.bind("<Escape>",lambda event: self.kot_win.destroy())
         self.kot_win.resizable(0,0)
         self.kot_win.attributes('-toolwindow', True)
-  
+
+class Report:
+    def __init__(self):
+        self.rep_win=Toplevel()
+        self.rep_win.state('zoomed')
+        self.rep_win.config(bg=background)
+        self.frame_banner=Frame(self.rep_win,bg=background)
+        self.frame_banner.grid(row=0,column=0)
+        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=self.banner_img.resize((self.rep_win.winfo_screenwidth(),150),Image.ANTIALIAS)
+        self.main_banner=ImageTk.PhotoImage(self.banner_img)
+        self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
+        self.banner_lbl=Label(self.frame_banner,image=self.main_banner,bg=background)
+        self.banner_lbl.grid(row=0,column=0)
+        self.body_frame=Frame(self.rep_win,bg=background)
+        self.body_frame.grid(row=1,column=0)
+        self.rep_win.bind("<Escape>",lambda event: self.rep_win.destroy())
+        self.rep_win.resizable(0,0)
+        self.rep_win.attributes('-toolwindow', True)
+        
+        self.body_frame=Frame(self.rep_win,bg=background)
+        self.body_frame.grid(row=1,column=0,pady=15)
+
+        self.menu_banner_image=ImageTk.PhotoImage(Image.open('icons\\report_win_ico.png'))
+        self.menu_ban=Label(self.body_frame,text="     REPORTS",font="Candara 40 bold",image=self.menu_banner_image,compound="left",bd=0,bg=background,fg=foreground,activebackground=background)
+        self.menu_ban.grid(row=0,column=0)
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     Home()
    
