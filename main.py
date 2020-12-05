@@ -824,7 +824,7 @@ class BILLING:
         self.billing_font=Font(family="candara",size=20,weight="bold")
         self.kot_b=Button(self.frame1,text='KOT',image=self.kot_icon,bg=background,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top',command=self.kot_func)
         self.kot_b.grid()
-        self.pos_b=Button(self.frame2,text='POS',bg=background,image=self.pos_icon,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top')
+        self.pos_b=Button(self.frame2,text='POS',bg=background,image=self.pos_icon,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top',command=self.pos_func)
         self.pos_b.grid()
         self.payment_b=Button(self.frame3,text='Payment',image=self.paymnet_icon,bg=background,fg=foreground,bd=0,font=self.billing_font,activebackground=background,compound='top')
         self.payment_b.grid()
@@ -837,6 +837,8 @@ class BILLING:
         self.billing_win.attributes('-toolwindow', True)
     def kot_func(self):
         KOT()
+    def pos_func(self):
+        POS()    
 class KOT:
     def __init__(self):
         self.kot_win=Toplevel()
@@ -855,6 +857,7 @@ class KOT:
         self.kot_win.bind("<Escape>",lambda event: self.kot_win.destroy())
         self.kot_win.resizable(0,0)
         self.kot_win.attributes('-toolwindow', True)
+
 
 class Report:
     def __init__(self):
