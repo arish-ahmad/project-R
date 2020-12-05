@@ -6,10 +6,13 @@ from PIL import Image,ImageTk
 from tkinter import ttk
 from tkinter import messagebox
 from csv import DictWriter,writer
+from datetime import date,time,datetime
 import csv,os
 import random
 import mysql.connector
 #-----------Functions-------------
+
+
 def correct(inp):
     if inp.isdigit():
         return True
@@ -255,11 +258,15 @@ class Item_reg:
         self.rate_e.bind("<Down>",lambda event: self.cat_combobox.focus())
         self.rate_e.bind("<Up>",lambda event: self.item_name_e.focus())
         #Fetch category list
-        my_cursor.execute('SELECT Unit_name FROM Category_Record')
-        self.Category_list=my_cursor.fetchall()
         self.combo_values=[]
-        for cat in self.Category_list:
-            self.combo_values.append(cat[0])
+        try:
+            my_cursor.execute('SELECT Unit_name FROM Category_Record')
+            self.Category_list=my_cursor.fetchall()
+            
+            for cat in self.Category_list:
+                self.combo_values.append(cat[0])
+        except:
+            self.combo_values.append("None")
         #-----------------------------------
         self.cat_combobox=ttk.Combobox(self.body_frame,width=14,font=main_font,state="readonly")
         self.cat_combobox["values"]=self.combo_values 
@@ -854,9 +861,248 @@ class KOT:
         self.banner_lbl.grid(row=0,column=0)
         self.body_frame=Frame(self.kot_win,bg=background)
         self.body_frame.grid(row=1,column=0)
+        self.header_frame=Frame(self.body_frame,bg=background)
+        self.header_frame.grid(row=0,column=0)
+        self.new_kot_label=Label(self.header_frame,text='New KOT Generate    ',font='candara 30 bold',bg=background,fg=foreground)
+        self.new_kot_label.grid(row=0,column=0,padx=80)
+        #----------icons----------------------
+        self.reorder_ico=ImageTk.PhotoImage(Image.open('icons\\re_order.png'))
+        self.bill_payment_ico=ImageTk.PhotoImage(Image.open('icons\\bill_payment.png'))
+        self.bill_generate_ico=ImageTk.PhotoImage(Image.open('icons\\bill_generate.png'))
+        self.new_kot_ico=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
+        self.addcart_ico=ImageTk.PhotoImage(Image.open('icons\\add_ico.png'))
+        self.submit_ico=ImageTk.PhotoImage(Image.open('icons\\add_ico.png'))
+        self.delete_ico=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
+        #----------------Shortcut buttons-----------------
+        self.main_font=Font(family="candara",size=16,weight='normal')
+        self.reorder=Button(self.header_frame,image=self.reorder_ico,bg=background,activebackground=background,bd=0)
+        self.reorder.grid(row=0,column=1,padx=30)
+        self.bill_payment=Button(self.header_frame,image=self.bill_payment_ico,bg=background,activebackground=background,bd=0)
+        self.bill_payment.grid(row=0,column=2,padx=30)
+        self.bill_generate=Button(self.header_frame,image=self.bill_generate_ico,bg=background,activebackground=background,bd=0)
+        self.bill_generate.grid(row=0,column=3,padx=30)
+        #------------------------------------------------
+        self.primary_body_frame=Frame(self.body_frame,bg=background,bd=0)
+        self.primary_body_frame.grid(row=1,column=0,pady=40)
+        self.disc_body_frame=Frame(self.primary_body_frame,bg=background,bd=0)
+        self.disc_body_frame.grid(row=0,column=0)
+        self.waiter_l=Label(self.disc_body_frame,text='Waiter Name',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.waiter_l.grid(row=0,column=0,sticky=t.W,padx=15)
+        #------------fetch Waiters name----------------
+        self.combo_values=[]
+        try:
+            my_cursor.execute('SELECT Empl_name,Empl_type FROM employees_Record ')
+            self.Category_list=my_cursor.fetchall()
+            for cat in self.Category_list:
+                if cat[1] == 'Waiter':
+                    self.combo_values.append(cat[0])
+        except:
+            self.combo_values.append('None')
+        #-----------------------------------
+        self.waiter_combobox=ttk.Combobox(self.disc_body_frame,width=18,font='candara 17',state="readonly")
+        self.waiter_combobox["values"]=self.combo_values
+        self.waiter_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
+        self.waiter_combobox.grid(row=1,column=0,sticky=t.W,padx=20)
+        self.waiter_combobox.focus()
+        self.waiter_combobox.bind('<Return>',lambda event: self.table_combobox.focus())
+        self.waiter_combobox.bind('<Right>',lambda event: self.table_combobox.focus())
+
+        self.table_l=Label(self.disc_body_frame,text='Table *',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.table_l.grid(row=0,column=1,sticky=t.W,padx=20)
+        self.table_combobox=ttk.Combobox(self.disc_body_frame,width=16,font='candara 17')
+        self.table_combobox["values"]=['1','2','3','4','5']
+        self.table_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
+        self.table_combobox.grid(row=1,column=1,padx=30)
+        self.table_combobox.bind('<Return>',lambda event: self.item_en.focus())
+        self.table_combobox.bind('<Right>',lambda event: self.date_en.focus())
+        self.table_combobox.bind('<Left>',lambda event: self.waiter_combobox.focus())   
+
+        self.kot_l=Label(self.disc_body_frame,text='KOT NO *',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.kot_l.grid(row=0,column=2,sticky=t.W,padx=22)
+        self.kot_en=Entry(self.disc_body_frame,width=14,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.kot_en.grid(row=1,column=2,padx=30)
+        self.kot_en.insert(END,50*random.randint(50,100))
+        self.kot_en.config(state='readonly')
+
+        self.date_l=Label(self.disc_body_frame,text='Date Time',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.date_l.grid(row=0,column=3,sticky=t.W,padx=20)
+        self.date_en=Entry(self.disc_body_frame,width=17,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.date_en.grid(row=1,column=3,sticky=t.E,padx=20)
+        self.date_en.insert(END,str(datetime.now().strftime('%H:%M:%S')+str(' | ')+str(date.today().strftime('%d/%m/%y'))))
+        self.date_en.bind('<Return>',lambda event: self.item_en.focus())
+        self.date_en.bind('<Right>',lambda event: self.item_en.focus())
+        self.date_en.bind('<Left>',lambda event: self.table_combobox.focus())  
+
+        self.empty_l=Label(self.disc_body_frame,bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.empty_l.grid(row=2,column=0)
+        self.item_l=Label(self.disc_body_frame,text='Item *',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.item_l.grid(row=3,column=0,sticky=t.W,padx=20)
+        self.quantity_l=Label(self.disc_body_frame,text='Quantity *',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.quantity_l.grid(row=3,column=1,sticky=t.W,padx=30)
+        self.rate_l=Label(self.disc_body_frame,text='Rate *',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.rate_l.grid(row=3,column=2,sticky=t.W,padx=30)
+        self.unit_l=Label(self.disc_body_frame,text='Unit',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.unit_l.grid(row=3,column=3,sticky=t.W,padx=30)
+
+        self.item_en=Entry(self.disc_body_frame,width=19,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.item_en.grid(row=4,column=0,sticky=t.W,padx=20)
+        self.item_en.bind('<Return>',self.item_return)
+        self.item_en.bind('<Up>',lambda event: self.waiter_combobox.focus())
+
+        self.quantity_en=Entry(self.disc_body_frame,width=17,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.quantity_en.grid(row=4,column=1,padx=20)
+        self.quantity_validation=self.quantity_en.register(correct)                                # Input only Integer type
+        self.quantity_en.config(validate="key",validatecommand=(self.quantity_validation,"%P"))
+        self.quantity_en.bind('<Return>',self.quantity_func)
+
+        self.rate_en=Entry(self.disc_body_frame,width=14,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.rate_en.grid(row=4,column=2,padx=20)
+        self.rate_validation=self.rate_en.register(correct)                                # Input only Integer type
+        self.rate_en.config(validate="key",validatecommand=(self.rate_validation,"%P"))
+        self.rate_en.bind('<Return>',lambda event: self.addcart_func())
+
+        self.unit_add_frame=Frame(self.disc_body_frame,bg=background,bd=0)
+        self.unit_add_frame.grid(row=4,column=3)
+        self.unit_en=Entry(self.unit_add_frame,width=11,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.unit_en.grid(row=0,column=0)
+        self.addcart=Button(self.unit_add_frame,image=self.addcart_ico,bg=background,activebackground=background,bd=0,command=self.addcart_func)
+        self.addcart.grid(row=0,column=1)
+        self.addcart.bind('<Return>',lambda event: self.addcart_func())
+        self.cart_frame=Frame(self.primary_body_frame,bg=background)
+        self.cart_frame.grid(row=1,column=0,pady=10)
+        self.cart_label=Label(self.cart_frame,bg=background,font='candara 16 bold',bd=0,text='Selected Items List',width=96,fg=foreground)
+        self.cart_label.grid(row=1,column=0)
+        self.tree_view()
+        self.quantity_list=[]
+        self.amount_list=[]
+        self.total_quantity_value=0
+        self.total_amount_value=0
         self.kot_win.bind("<Escape>",lambda event: self.kot_win.destroy())
         self.kot_win.resizable(0,0)
         self.kot_win.attributes('-toolwindow', True)
+    def item_return(self,event):
+        '''this function check the item in database if not found it return list of items'''
+        item_discription=self.item_func()
+        if self.item_en.get() in  item_discription:
+            self.quantity_en.focus()
+        else:
+            self.items_list(self.item_en,'Saved Items',background,foreground)
+    def item_func(self):
+        ''' This function check the item in database if item is found it return Discription of item'''
+        my_cursor.execute('SELECT Item_name,Rate,Category FROM Items_Record')
+        data=my_cursor.fetchall()
+        item_discription=()
+        for item in data:
+            if self.item_en.get() in item:
+                item_discription=item
+        return item_discription
+    def items_list(self,en,tit,background,foreground):
+        '''This function create the listbox of items in toplevel window'''
+        root = Toplevel()
+        root.title(tit)
+        select=[]
+        items_l=[]
+        my_cursor.execute('SELECT Item_name FROM Items_Record')
+        data=my_cursor.fetchall()
+        for cat in data:
+            items_l.append(cat[0])
+        items_l.sort(key=lambda x: x[0])
+        root.geometry("245x200+155+440")
+        def CurSelet(event):
+            widget = event.widget
+            selection=widget.curselection()
+            picked = widget.get(selection[0])
+            select.append(picked)
+        def lb_bind(event):
+            en.delete(0,END)
+            en.insert(END,select[-1])
+            root.destroy()
+        listbox = Listbox(root,width=25,height=40,selectbackground=foreground,background=background,font=('times',13)) 
+        listbox.bind('<<ListboxSelect>>',CurSelet)
+        root.bind("<Return>",lb_bind)
+        listbox.pack(side = LEFT, fill = BOTH) 
+        scrollbar = Scrollbar(root,bg=background) 
+        scrollbar.pack(side = RIGHT, fill = BOTH)
+        for i in items_l:
+            listbox.insert(END,i)
+        def esc(event):
+            root.destroy()
+        listbox.focus_force() 
+        listbox.config(yscrollcommand = scrollbar.set) 
+        scrollbar.config(command = listbox.yview) 
+        root.bind("<Escape>",esc)
+        root.resizable(0,0)
+        root.attributes('-toolwindow', True)
+        root.overrideredirect(1)
+    def quantity_func(self,event):
+        '''This function automate the item rate and unit''' 
+        self.item=self.item_func()
+        self.rate_en.insert(END,int(self.item[1]))
+        self.unit_en.insert(END,self.item[2])
+        self.unit_en.config(state='readonly')
+        self.addcart.focus()
+    def addcart_func(self):
+        '''This function insert data in tree view and create buttons'''
+        if self.unit_en.get() =="":
+            messagebox.showerror(parent=self.kot_win,title='Error',message='Please add Item Discription')
+        else:
+            self.insert_treeview()
+            self.item_en.delete(0,END)
+            self.quantity_en.delete(0,END)
+            self.rate_en.delete(0,END)
+            self.unit_en.delete(0,END)
+            self.item_en.focus()
+            self.submit_b=Button(self.cart_frame,bg=background,image=self.delete_ico,activebackground=background,bd=0)
+            self.submit_b.grid(row=0,column=0,sticky=W,padx=340)
+            self.delete_b=Button(self.cart_frame,image=self.delete_ico,bg=background,bd=0,activebackground=background)
+            self.delete_b.grid(row=0,column=0,sticky=E,padx=300)
+            self.cart_frame.grid(row=1,column=0)
+    def tree_view(self):
+        '''This function creates the  Empty Tree view'''
+        self.style=ttk.Style()  
+        self.style.configure('mystyle.Treeview',highlightthickness=0,bd=0,background=background,fieldfbackground=background,foreground=foreground,font=('candara',12))
+        self.style.configure('mystyle.Treeview.Heading',font=('candara',14,'bold'))
+        self.style.layout('mystyle.Treeview',[('mystyle.Treeview.treearea',{'sticky':'nswe'})])
+        self.tree_frame=Frame(self.cart_frame,bg=background)
+        self.tree_frame.grid(row=2,column=0)
+        self.vertical_scrollbar=ttk.Scrollbar(self.tree_frame)
+        self.vertical_scrollbar.grid(row=0,column=1,sticky='ns')
+        self.data_tree=ttk.Treeview(self.tree_frame,style="mystyle.Treeview",yscrollcommand=self.vertical_scrollbar.set)
+        self.vertical_scrollbar.config(command=self.data_tree.yview)
+        self.data_tree['columns']=('0','1','2','3','4')
+        self.data_tree.column("#0",width=1)
+        self.data_tree.column("0",width=260,anchor='center')
+        self.data_tree.column("1",width=200,anchor='center')
+        self.data_tree.column("2",width=200,anchor='center')
+        self.data_tree.column("3",width=220,anchor='center')
+        self.data_tree.column("4",width=160,anchor='center')
+        self.data_tree.heading('#0',text='')
+        self.data_tree.heading("0",text="Item")
+        self.data_tree.heading("1",text="Quantity")
+        self.data_tree.heading("2",text="Rate")
+        self.data_tree.heading("3",text='Amount')
+        self.data_tree.heading("4",text='Unit')
+        #self.insert_treeview() 
+        self.data_tree.grid(row=0,column=0) 
+    def insert_treeview(self):
+        '''This function insert data in tree view'''
+        quantity_var=self.quantity_en.get()
+        if self.quantity_en.get() =="":
+            quantity_var=1
+        #insert new data from entry boxes
+        self.data_tree.insert("","end",text="",values=(self.item_en.get(),quantity_var,self.rate_en.get(),int(quantity_var)*int(self.rate_en.get()),self.unit_en.get()))
+        #fetch total quantity and total amount from treeview data
+        self.quantity_list.append(self.data_tree.item(self.data_tree.get_children()[-1])['values'][1])
+        self.amount_list.append(self.data_tree.item(self.data_tree.get_children()[-1])['values'][3])
+        self.total_quantity_value=sum(self.quantity_list)
+        self.total_amount_value=sum(self.amount_list)
+        #labels of sub total, total quantity and total amount
+        self.total_quantity=Label(self.cart_frame,bg='white',font='candara 16 bold',bd=0,text=str(self.total_quantity_value),width=46,fg=foreground)
+        self.total_quantity.grid(row=3,column=0,sticky=W,padx=130)
+        self.total_amount=Label(self.cart_frame,bg='white',font='candara 16 bold',bd=0,text=str(self.total_amount_value),width=46,fg=foreground)
+        self.total_amount.grid(row=3,column=0,sticky=E)
+        self.sub_total_l=Label(self.cart_frame,bg='white',font='candara 16 bold',bd=0,text='Sub Total',width=25,fg=foreground)
+        self.sub_total_l.grid(row=3,column=0,sticky=W)
 
 
 class Report:
