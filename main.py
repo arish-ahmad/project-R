@@ -945,7 +945,7 @@ class KOT:
         self.date_l.grid(row=0,column=3,sticky=t.W,padx=20)
         self.date_en=Entry(self.disc_body_frame,width=17,bg='white',fg=foreground,font='candara 17',bd=2)
         self.date_en.grid(row=1,column=3,sticky=t.E,padx=20)
-        self.date_en.insert(END,str(datetime.now().strftime('%H:%M:%S')+str(' | ')+str(date.today().strftime('%d/%m/%y'))))
+        self.date_en.insert(END,str(date.today().strftime('%d/%m/%y')+str(' | ')+datetime.now().strftime('%H:%M:%S')))
         self.date_en.bind('<Return>',lambda event: self.item_en.focus())
         self.date_en.bind('<Right>',lambda event: self.item_en.focus())
         self.date_en.bind('<Left>',lambda event: self.table_combobox.focus())  
@@ -1069,11 +1069,121 @@ class KOT:
             self.rate_en.delete(0,END)
             self.unit_en.delete(0,END)
             self.item_en.focus()
-            self.submit_b=Button(self.cart_frame,bg=background,image=self.delete_ico,activebackground=background,bd=0)
-            self.submit_b.grid(row=0,column=0,sticky=W,padx=340)
+            self.submit_b=Button(self.cart_frame,bg=background,image=self.submit_ico,activebackground=background,bd=0,command=self.kot)
+            self.submit_b.grid(row=4,column=0,sticky=E,pady=10)
             self.delete_b=Button(self.cart_frame,image=self.delete_ico,bg=background,bd=0,activebackground=background)
-            self.delete_b.grid(row=0,column=0,sticky=E,padx=300)
+            self.delete_b.grid(row=4,column=0,sticky=E,padx=150,pady=10)
             self.cart_frame.grid(row=1,column=0)
+
+
+    def kot(self):   
+        dir=os.path.dirname(reportlab.__file__)
+        font_folder=os.path.join(dir,'fonts')
+
+        custom_font_folder=os.path.join(font_folder,'sans.ttf')
+        custom_font=TTFont('sans',custom_font_folder)
+        pdfmetrics.registerFont(custom_font)
+
+
+        custom_font_folder1=os.path.join(font_folder,'sans bold.ttf')
+        custom_font1=TTFont('sans bold',custom_font_folder1)
+        pdfmetrics.registerFont(custom_font1)
+
+        self.cart=[]
+
+        for line in self.data_tree.get_children():
+            for value in self.data_tree.item(line)['values']:
+                self.cart.append(value)
+        self.item=[]  
+        self.quan=[] 
+        
+        self.l=len(self.cart) 
+        i=0
+        j=1
+        
+        while i<self.l:
+            self.item.append(self.cart[i])
+            i=i+5
+        while j<self.l:
+            self.quan.append(self.cart[j])
+            j=j+5
+
+        pagesize=(58 * mm, (42+(5*len(self.item)))*mm)
+        
+        pdf=canvas.Canvas('KOT.pdf',pagesize=pagesize)
+        
+        q=((240/92)*(42+(5*len(self.item))))
+        
+        pdf=canvas.Canvas('KOT.pdf',pagesize=pagesize)
+
+        pdf.setFont("sans bold",10)
+        pdf.drawString(45,q,"ABC RESTUARANT")
+
+        pdf.setFont("sans",8)
+        pdf.drawString(15,q-6,"---------------------------------")
+        pdf.drawString(22,q-13,"Address line 1, Address line 2")
+        pdf.drawString(53,q-22,"Contact details")
+        pdf.drawString(15,q-27,"---------------------------------")
+        pdf.setFont("sans bold",9)
+        pdf.drawString(75,q-38,"KOT")
+        pdf.setFont("sans",8)
+        pdf.drawString(10,q-50,'Ticket No:')
+        pdf.drawString(52,q-50,self.kot_en.get())
+        pdf.drawString(100,q-50,"Waiter:")
+        pdf.drawString(130,q-50,self.waiter_combobox.get())
+        pdf.drawString(10,q-57,'Table No :')
+        pdf.drawString(52,q-57,self.table_combobox.get())
+        pdf.drawString(10,q-64,"Date :")
+        pdf.drawString(35,q-64,self.date_en.get())
+        pdf.drawString(9,q-70,"-------------------------------------")
+        pdf.setFont("sans",9)
+        pdf.drawString(10,q-77,'Item')
+        pdf.drawString(120,q-77,'Quantity')
+        # pdf.drawString(130,159,'Price')
+        pdf.setFont("sans",8)
+        pdf.drawString(9,q-83,"-------------------------------------")
+        # pdf.drawString(10,147,'Chicken Korma')
+        # pdf.drawString(135,147,'2')
+        y=q-90
+        
+        for k in self.item:
+            s=str(k)
+            pdf.drawString(9,y,s)
+            y=y-10
+
+        y=q-90   
+        for l in self.quan:
+            u=str(l) 
+            pdf.drawString(135,y,u)
+            y=y-10
+
+         
+        y=((q-90)-(len(self.item)*10))
+        pdf.drawString(9,y,"-------------------------------------")
+        
+
+        # pdf.drawString(135,147,'400')
+        
+        pdf.setFont("sans bold",9)
+        pdf.drawString(70,y-8,'Total Quantity :')
+        pdf.drawString(133,y-8,str(self.total_quantity_value))
+        # pdf.drawString(50,115,'CGST @2.5% :   RS. 15')
+        # pdf.drawString(50,105,'SGST @2.5% :   RS. 15')
+        pdf.setFont("sans",8)
+        pdf.drawString(9,y-16,"-------------------------------------")
+        # pdf.setFont("sans",10)
+        # pdf.drawString(60,88,'TOTAL :    RS. 630')
+        # pdf.setFont("sans",8)
+        # pdf.drawString(9,81,"-------------------------------------")
+
+
+
+
+
+        pdf.save()
+        webbrowser.open_new("KOT.pdf") 
+
+
     def tree_view(self):
         '''This function creates the  Empty Tree view'''
         self.style=ttk.Style()  
@@ -1427,6 +1537,10 @@ class POS:
         custom_font_folder=os.path.join(font_folder,'sans.ttf')
         custom_font=TTFont('sans',custom_font_folder)
         pdfmetrics.registerFont(custom_font)
+        custom_font_folder1=os.path.join(font_folder,'sans bold.ttf')
+        custom_font1=TTFont('sans bold',custom_font_folder1)
+        pdfmetrics.registerFont(custom_font1)
+
         
         self.cart=[]
 
@@ -1435,11 +1549,13 @@ class POS:
                 self.cart.append(value)
         self.item=[]  
         self.quan=[] 
+        self.rate=[]
         self.price=[] 
         self.l=len(self.cart) 
         i=0
         j=1
-        k=3 
+        k=2
+        l=3
         while i<self.l:
             self.item.append(self.cart[i])
             i=i+5
@@ -1447,22 +1563,27 @@ class POS:
             self.quan.append(self.cart[j])
             j=j+5
         while k<self.l:
-            self.price.append(self.cart[k])
+            self.rate.append(self.cart[k])
             k=k+5    
+        while l<self.l:
+            self.price.append(self.cart[l])
+            l=l+5    
 
         pagesize=(58 * mm, (60+(4*len(self.item)))*mm)
         pdf=canvas.Canvas('POS.pdf',pagesize=pagesize)
-        pdf.setFont("sans",10)
+        pdf.setFont("sans bold",10)
         q=((240/92)*(60+(4*len(self.item))))
 
-        pdf.drawString(50,q,"ABC RESTUARANT")
+        
+
+        pdf.drawString(45,q,"ABC RESTUARANT")
         pdf.setFont("sans",8)
         pdf.drawString(15,q-6,"---------------------------------")
         pdf.drawString(22,q-13,"Address line 1, Address line 2")
         pdf.drawString(53,q-22,"Contact details")
         pdf.drawString(15,q-27,"---------------------------------")
 
-        pdf.setFont("sans",9)
+        pdf.setFont("sans bold",9)
         pdf.drawString(56,q-38,"TAX INVOICE")
         pdf.setFont("sans",8)
         pdf.drawString(10,q-50,"Invoice No : ")
@@ -1473,8 +1594,9 @@ class POS:
 
         pdf.setFont("sans",9)
         pdf.drawString(10,q-75,'Item')
-        pdf.drawString(75,q-75,'Quantity')
-        pdf.drawString(130,q-75,'Price')
+        pdf.drawString(80,q-75,'Qty')
+        pdf.drawString(105,q-75,'Rate')
+        pdf.drawString(135,q-75,'Price')
         pdf.setFont("sans",8)
         pdf.drawString(9,q-80,"-------------------------------------")
         y=q-88
@@ -1484,16 +1606,26 @@ class POS:
             pdf.drawString(9,y,s)
             y=y-10
 
+
+        y=q-88
+
+        for n in self.rate:
+            p=str(n) 
+            pdf.drawString(105,y,p)
+            y=y-10    
+
         y=q-88   
         for l in self.quan:
             u=str(l) 
-            pdf.drawString(95,y,u)
+            pdf.drawString(85,y,u)
             y=y-10
+
+        
 
         y=q-88   
         for m in self.price:
             z=str(m)
-            pdf.drawString(135,y,z)
+            pdf.drawString(136,y,z)
             y=y-10
                     
         y=((q-88)-(len(self.item)*10))
@@ -1508,9 +1640,9 @@ class POS:
         pdf.setFont("sans",8)
         pdf.drawString(9,y-40,"-------------------------------------")
 
-        pdf.setFont("sans",10)
+        pdf.setFont("sans bold",10)
         pdf.drawString(65,y-50,'TOTAL : ')
-        pdf.drawString(125,y-50,str(1.00*(self.total_amount_value)+(self.total_amount_value*0.050)))
+        pdf.drawString(122,y-50,str(1.00*(self.total_amount_value)+(self.total_amount_value*0.050)))
         pdf.setFont("sans",8)
         pdf.drawString(9,y-60,"-------------------------------------")
         print(y)
