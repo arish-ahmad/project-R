@@ -10,7 +10,20 @@ from datetime import date,time,datetime
 import csv,os
 import random
 import mysql.connector
-#-----------Functions-------------
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import mm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import reportlab
+import os
+import webbrowser
+from sys import *
+from completion_script import AutocompleteCombobox
+#-----------Functions--------
+
+
+
+
 
 
 def correct(inp):
@@ -47,6 +60,11 @@ my_cursor.execute('''create database if not exists Restaurant_db''')
 my_cursor.execute('''use Restaurant_db''')
 mydb.commit()
 #---------------------------------
+
+
+
+
+
 class Home:
     global background,foreground
     def __init__(self):
@@ -848,12 +866,12 @@ class BILLING:
         POS()    
 class KOT:
     def __init__(self):
-        self.kot_win=Toplevel()
+        self.kot_win=Toplevel(class_='AutocompleteEntry demo')
         self.kot_win.state('zoomed')
         self.kot_win.config(bg=background)
         self.frame_banner=Frame(self.kot_win,bg=background)
         self.frame_banner.grid(row=0,column=0)
-        self.banner_img=Image.open('icons\\home_ban.jpg')
+        self.banner_img=Image.open('icons\\home_ban_copy.jpg')
         self.banner_img=self.banner_img.resize((self.kot_win.winfo_screenwidth(),150),Image.ANTIALIAS)
         self.main_banner=ImageTk.PhotoImage(self.banner_img)
         self.Exit_icon=ImageTk.PhotoImage(Image.open('icons\\back.png'))
@@ -871,8 +889,8 @@ class KOT:
         self.bill_generate_ico=ImageTk.PhotoImage(Image.open('icons\\bill_generate.png'))
         self.new_kot_ico=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
         self.addcart_ico=ImageTk.PhotoImage(Image.open('icons\\add_ico.png'))
-        self.submit_ico=ImageTk.PhotoImage(Image.open('icons\\add_ico.png'))
-        self.delete_ico=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
+        self.submit_ico=ImageTk.PhotoImage(Image.open('icons\\subm.jpg'))
+        self.delete_ico=ImageTk.PhotoImage(Image.open('icons\\del.jpg'))
         #----------------Shortcut buttons-----------------
         self.main_font=Font(family="candara",size=16,weight='normal')
         self.reorder=Button(self.header_frame,image=self.reorder_ico,bg=background,activebackground=background,bd=0)
@@ -899,10 +917,11 @@ class KOT:
         except:
             self.combo_values.append('None')
         #-----------------------------------
-        self.waiter_combobox=ttk.Combobox(self.disc_body_frame,width=18,font='candara 17',state="readonly")
+        self.waiter_combobox=AutocompleteCombobox(self.disc_body_frame,width=18,font='candara 17')
         self.waiter_combobox["values"]=self.combo_values
         self.waiter_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
         self.waiter_combobox.grid(row=1,column=0,sticky=t.W,padx=20)
+        self.waiter_combobox.set_completion_list(self.combo_values)
         self.waiter_combobox.focus()
         self.waiter_combobox.bind('<Return>',lambda event: self.table_combobox.focus())
         self.waiter_combobox.bind('<Right>',lambda event: self.table_combobox.focus())
@@ -913,7 +932,7 @@ class KOT:
         self.table_combobox["values"]=['1','2','3','4','5']
         self.table_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
         self.table_combobox.grid(row=1,column=1,padx=30)
-        self.table_combobox.bind('<Return>',lambda event: self.item_en.focus())
+        self.table_combobox.bind('<Return>',lambda event: self.item_combobox.focus())
         self.table_combobox.bind('<Right>',lambda event: self.date_en.focus())
         self.table_combobox.bind('<Left>',lambda event: self.waiter_combobox.focus())   
 
@@ -928,10 +947,10 @@ class KOT:
         self.date_l.grid(row=0,column=3,sticky=t.W,padx=20)
         self.date_en=Entry(self.disc_body_frame,width=17,bg='white',fg=foreground,font='candara 17',bd=2)
         self.date_en.grid(row=1,column=3,sticky=t.E,padx=20)
-        self.date_en.insert(END,str(datetime.now().strftime('%H:%M:%S')+str(' | ')+str(date.today().strftime('%d/%m/%y'))))
-        self.date_en.bind('<Return>',lambda event: self.item_en.focus())
-        self.date_en.bind('<Right>',lambda event: self.item_en.focus())
-        self.date_en.bind('<Left>',lambda event: self.table_combobox.focus())  
+        self.date_en.insert(END,str(date.today().strftime('%d/%m/%y')+str(' | ')+datetime.now().strftime('%H:%M:%S')))
+        self.date_en.bind('<Return>',lambda event: self.item_combobox.focus())
+        self.date_en.bind('<Right>',lambda event: self.item_combobox.focus())
+        self.date_en.bind('<Left>',lambda event: self.item_combobox.focus())  
 
         self.empty_l=Label(self.disc_body_frame,bg=background,fg=foreground,bd=0,font=self.main_font)
         self.empty_l.grid(row=2,column=0)
@@ -944,10 +963,25 @@ class KOT:
         self.unit_l=Label(self.disc_body_frame,text='Unit',bg=background,fg=foreground,bd=0,font=self.main_font)
         self.unit_l.grid(row=3,column=3,sticky=t.W,padx=30)
 
-        self.item_en=Entry(self.disc_body_frame,width=19,bg='white',fg=foreground,font='candara 17',bd=2)
-        self.item_en.grid(row=4,column=0,sticky=t.W,padx=20)
-        self.item_en.bind('<Return>',self.item_return)
-        self.item_en.bind('<Up>',lambda event: self.waiter_combobox.focus())
+       #------------fetch items name----------------
+        self.combo_items=[]
+        try:
+            my_cursor.execute('SELECT Item_name FROM Items_Record')
+            self.items_list=my_cursor.fetchall()
+            for c in self.items_list:
+                self.combo_items.append(c[0])
+        except:
+            self.combo_items.append('None')
+        #-----------------------------------
+        self.item_combobox=AutocompleteCombobox(self.disc_body_frame,width=18,font='candara 17')
+        self.item_combobox["values"]=self.combo_items
+        self.item_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
+        self.item_combobox.grid(row=4,column=0,sticky=t.W,padx=20)
+        self.item_combobox.set_completion_list(self.combo_items)
+        self.item_combobox.focus()
+        self.item_combobox.bind('<Right>',lambda event: self.table_combobox.focus())
+        self.item_combobox.bind('<Return>',self.item_return)
+        self.item_combobox.bind('<Up>',lambda event: self.waiter_combobox.focus())
 
         self.quantity_en=Entry(self.disc_body_frame,width=17,bg='white',fg=foreground,font='candara 17',bd=2)
         self.quantity_en.grid(row=4,column=1,padx=20)
@@ -983,57 +1017,19 @@ class KOT:
     def item_return(self,event):
         '''this function check the item in database if not found it return list of items'''
         item_discription=self.item_func()
-        if self.item_en.get() in  item_discription:
+        if self.item_combobox.get() in  item_discription:
             self.quantity_en.focus()
         else:
-            self.items_list(self.item_en,'Saved Items',background,foreground)
+            self.item_combobox.focus()
     def item_func(self):
         ''' This function check the item in database if item is found it return Discription of item'''
         my_cursor.execute('SELECT Item_name,Rate,Category FROM Items_Record')
         data=my_cursor.fetchall()
         item_discription=()
         for item in data:
-            if self.item_en.get() in item:
+            if self.item_combobox.get() in item:
                 item_discription=item
         return item_discription
-    def items_list(self,en,tit,background,foreground):
-        '''This function create the listbox of items in toplevel window'''
-        root = Toplevel()
-        root.title(tit)
-        select=[]
-        items_l=[]
-        my_cursor.execute('SELECT Item_name FROM Items_Record')
-        data=my_cursor.fetchall()
-        for cat in data:
-            items_l.append(cat[0])
-        items_l.sort(key=lambda x: x[0])
-        root.geometry("245x200+155+440")
-        def CurSelet(event):
-            widget = event.widget
-            selection=widget.curselection()
-            picked = widget.get(selection[0])
-            select.append(picked)
-        def lb_bind(event):
-            en.delete(0,END)
-            en.insert(END,select[-1])
-            root.destroy()
-        listbox = Listbox(root,width=25,height=40,selectbackground=foreground,background=background,font=('times',13)) 
-        listbox.bind('<<ListboxSelect>>',CurSelet)
-        root.bind("<Return>",lb_bind)
-        listbox.pack(side = LEFT, fill = BOTH) 
-        scrollbar = Scrollbar(root,bg=background) 
-        scrollbar.pack(side = RIGHT, fill = BOTH)
-        for i in items_l:
-            listbox.insert(END,i)
-        def esc(event):
-            root.destroy()
-        listbox.focus_force() 
-        listbox.config(yscrollcommand = scrollbar.set) 
-        scrollbar.config(command = listbox.yview) 
-        root.bind("<Escape>",esc)
-        root.resizable(0,0)
-        root.attributes('-toolwindow', True)
-        root.overrideredirect(1)
     def quantity_func(self,event):
         '''This function automate the item rate and unit''' 
         self.item=self.item_func()
@@ -1047,16 +1043,86 @@ class KOT:
             messagebox.showerror(parent=self.kot_win,title='Error',message='Please add Item Discription')
         else:
             self.insert_treeview()
-            self.item_en.delete(0,END)
+            self.item_combobox.delete(0,END)
             self.quantity_en.delete(0,END)
             self.rate_en.delete(0,END)
             self.unit_en.delete(0,END)
-            self.item_en.focus()
-            self.submit_b=Button(self.cart_frame,bg=background,image=self.delete_ico,activebackground=background,bd=0)
-            self.submit_b.grid(row=0,column=0,sticky=W,padx=340)
+            self.item_combobox.focus()
+            self.submit_b=Button(self.cart_frame,bg=background,image=self.submit_ico,activebackground=background,bd=0,command=self.kot)
+            self.submit_b.grid(row=4,column=0,sticky=E,pady=10)
             self.delete_b=Button(self.cart_frame,image=self.delete_ico,bg=background,bd=0,activebackground=background)
-            self.delete_b.grid(row=0,column=0,sticky=E,padx=300)
+            self.delete_b.grid(row=4,column=0,sticky=E,padx=150,pady=10)
             self.cart_frame.grid(row=1,column=0)
+    def kot(self):   
+        dir=os.path.dirname(reportlab.__file__)
+        font_folder=os.path.join(dir,'fonts')
+        custom_font_folder=os.path.join(font_folder,'sans.ttf')
+        custom_font=TTFont('sans',custom_font_folder)
+        pdfmetrics.registerFont(custom_font)
+        custom_font_folder1=os.path.join(font_folder,'sans bold.ttf')
+        custom_font1=TTFont('sans bold',custom_font_folder1)
+        pdfmetrics.registerFont(custom_font1)
+        self.cart=[]
+        for line in self.data_tree.get_children():
+            for value in self.data_tree.item(line)['values']:
+                self.cart.append(value)
+        self.item=[]  
+        self.quan=[] 
+        self.l=len(self.cart) 
+        i=0
+        j=1
+        while i<self.l:
+            self.item.append(self.cart[i])
+            i=i+5
+        while j<self.l:
+            self.quan.append(self.cart[j])
+            j=j+5
+        pagesize=(58 * mm, (42+(5*len(self.item)))*mm)
+        pdf=canvas.Canvas('KOT.pdf',pagesize=pagesize)
+        q=((240/92)*(42+(5*len(self.item))))
+        pdf=canvas.Canvas('KOT.pdf',pagesize=pagesize)
+        pdf.setFont("sans bold",10)
+        pdf.drawString(45,q,"ABC RESTUARANT")
+        pdf.setFont("sans",8)
+        pdf.drawString(15,q-6,"---------------------------------")
+        pdf.drawString(22,q-13,"Address line 1, Address line 2")
+        pdf.drawString(53,q-22,"Contact details")
+        pdf.drawString(15,q-27,"---------------------------------")
+        pdf.setFont("sans bold",9)
+        pdf.drawString(75,q-38,"KOT")
+        pdf.setFont("sans",8)
+        pdf.drawString(10,q-50,'Ticket No:')
+        pdf.drawString(52,q-50,self.kot_en.get())
+        pdf.drawString(100,q-50,"Waiter:")
+        pdf.drawString(130,q-50,self.waiter_combobox.get())
+        pdf.drawString(10,q-57,'Table No :')
+        pdf.drawString(52,q-57,self.table_combobox.get())
+        pdf.drawString(10,q-64,"Date :")
+        pdf.drawString(35,q-64,self.date_en.get())
+        pdf.drawString(9,q-70,"-------------------------------------")
+        pdf.setFont("sans",9)
+        pdf.drawString(10,q-77,'Item')
+        pdf.drawString(120,q-77,'Quantity')
+        pdf.setFont("sans",8)
+        pdf.drawString(9,q-83,"-------------------------------------")
+        for k in self.item:
+            s=str(k)
+            pdf.drawString(9,y,s)
+            y=y-10
+        y=q-90   
+        for l in self.quan:
+            u=str(l) 
+            pdf.drawString(135,y,u)
+            y=y-10
+        y=((q-90)-(len(self.item)*10))
+        pdf.drawString(9,y,"-------------------------------------")
+        pdf.setFont("sans bold",9)
+        pdf.drawString(70,y-8,'Total Quantity :')
+        pdf.drawString(133,y-8,str(self.total_quantity_value))
+        pdf.setFont("sans",8)
+        pdf.drawString(9,y-16,"-------------------------------------")
+        pdf.save()
+        webbrowser.open_new("KOT.pdf") 
     def tree_view(self):
         '''This function creates the  Empty Tree view'''
         self.style=ttk.Style()  
@@ -1082,7 +1148,6 @@ class KOT:
         self.data_tree.heading("2",text="Rate")
         self.data_tree.heading("3",text='Amount')
         self.data_tree.heading("4",text='Unit')
-        #self.insert_treeview() 
         self.data_tree.grid(row=0,column=0) 
     def insert_treeview(self):
         '''This function insert data in tree view'''
@@ -1090,7 +1155,7 @@ class KOT:
         if self.quantity_en.get() =="":
             quantity_var=1
         #insert new data from entry boxes
-        self.data_tree.insert("","end",text="",values=(self.item_en.get(),quantity_var,self.rate_en.get(),int(quantity_var)*int(self.rate_en.get()),self.unit_en.get()))
+        self.data_tree.insert("","end",text="",values=(self.item_combobox.get(),quantity_var,self.rate_en.get(),int(quantity_var)*int(self.rate_en.get()),self.unit_en.get()))
         #fetch total quantity and total amount from treeview data
         self.quantity_list.append(self.data_tree.item(self.data_tree.get_children()[-1])['values'][1])
         self.amount_list.append(self.data_tree.item(self.data_tree.get_children()[-1])['values'][3])
@@ -1103,10 +1168,10 @@ class KOT:
         self.total_amount.grid(row=3,column=0,sticky=E)
         self.sub_total_l=Label(self.cart_frame,bg='white',font='candara 16 bold',bd=0,text='Sub Total',width=25,fg=foreground)
         self.sub_total_l.grid(row=3,column=0,sticky=W)
-
+#------------------------------------------------------------------------------------------------------------------------
 class POS:
     def __init__(self):
-        self.pos_win=Toplevel()
+        self.pos_win=Toplevel(class_='AutocompleteEntry demo')
         self.pos_win.state('zoomed')
         self.pos_win.config(bg=background)
         self.frame_banner=Frame(self.pos_win,bg=background)
@@ -1129,8 +1194,8 @@ class POS:
         self.bill_generate_ico=ImageTk.PhotoImage(Image.open('icons\\bill_generate.png'))
         self.new_kot_ico=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
         self.addcart_ico=ImageTk.PhotoImage(Image.open('icons\\add_ico.png'))
-        self.submit_ico=ImageTk.PhotoImage(Image.open('icons\\add_ico.png'))
-        self.delete_ico=ImageTk.PhotoImage(Image.open('icons\\delete.png'))
+        self.submit_ico=ImageTk.PhotoImage(Image.open('icons\\subm.jpg'))
+        self.delete_ico=ImageTk.PhotoImage(Image.open('icons\\del.jpg'))
         #----------------Shortcut buttons-----------------
         self.main_font=Font(family="candara",size=16,weight='normal')
         self.reorder=Button(self.header_frame,image=self.reorder_ico,bg=background,activebackground=background,bd=0)
@@ -1144,11 +1209,8 @@ class POS:
         self.primary_body_frame.grid(row=1,column=0,pady=40)
         self.disc_body_frame=Frame(self.primary_body_frame,bg=background,bd=0)
         self.disc_body_frame.grid(row=0,column=0)
-
-
         self.item_l=Label(self.disc_body_frame,text='Item *',bg=background,fg=foreground,bd=0,font=self.main_font)
-        self.item_l.grid(row=0,column=0,sticky=t.W,padx=30)
-
+        self.item_l.grid(row=3,column=0,sticky=t.W,padx=30)
         self.item_combo_values=[]
         self.rates=StringVar()
         self.selection=StringVar()
@@ -1161,131 +1223,59 @@ class POS:
                 self.item_combo_values.append(cat[0])
         except:
             self.item_combo_values.append('None')
-
-        def lookup(event):
-            self.selection=self.item_combobox.get()
-            self.query='''SELECT * FROM Items_Record WHERE Item_name=%s'''
-            my_cursor.execute(self.query,(self.selection,))
-            self.rates=my_cursor.fetchall()
-            for i in self.rates:
-                self.rate.set(i[2])
-                self.unit.set(i[3])
-            self.unit_en.config(state='readonly')    
-            
-        self.item_combobox=ttk.Combobox(self.disc_body_frame,width=16,font='candara 15',state="readonly")
+        self.item_combobox=AutocompleteCombobox(self.disc_body_frame,width=16,font='candara 17')
         self.item_combobox["values"]=self.item_combo_values
         self.item_combobox.option_add('*TCombobox*Listbox.font',("candara",15))
-        self.item_combobox.grid(row=1,column=0,sticky=t.W,padx=30)
+        self.item_combobox.grid(row=4,column=0,sticky=t.W,padx=30)
+        self.item_combobox.set_completion_list(self.item_combo_values)
         self.item_combobox.focus()
-        self.item_combobox.bind('<Return>',lambda event: self.table_combobox.focus())
-        self.item_combobox.bind('<Right>',lambda event: self.table_combobox.focus())   
-        self.item_combobox.bind("<<ComboboxSelected>>",lookup) 
-
-        
-
-        self.rate_l=Label(self.disc_body_frame,text='Rate *',bg=background,fg=foreground,bd=0,font=self.main_font)
-        self.rate_l.grid(row=0,column=1,sticky=t.W,padx=30)
-        self.rate_en=Entry(self.disc_body_frame,width=16,textvariable=self.rate,bg='white',fg=foreground,font='candara 17',bd=2)
-        self.rate_en.grid(row=1,column=1,padx=30,sticky=t.W)
-        self.rate_validation=self.rate_en.register(correct)                                # Input only Integer type
-        self.rate_en.config(validate="key",validatecommand=(self.rate_validation,"%P"))
-        self.rate_en.bind('<Return>',lambda event: self.addcart_func())
-
-
+        self.item_combobox.bind('<Return>',self.item_return)
+        self.item_combobox.bind('<Right>',lambda event: self.quantity_en.focus())   
         self.quantity_l=Label(self.disc_body_frame,text='Quantity *',bg=background,fg=foreground,bd=0,font=self.main_font)
-        self.quantity_l.grid(row=0,column=2,sticky=t.W,padx=30)
+        self.quantity_l.grid(row=3,column=1,sticky=t.W,padx=100)
         self.quantity_en=Entry(self.disc_body_frame,width=17,bg='white',fg=foreground,font='candara 17',bd=2)
-        self.quantity_en.grid(row=1,column=2,padx=30,sticky=t.W)
+        self.quantity_en.grid(row=4,column=1,padx=100,sticky=t.W)
         self.quantity_validation=self.quantity_en.register(correct)                                # Input only Integer type
         self.quantity_en.config(validate="key",validatecommand=(self.quantity_validation,"%P"))
-        # self.quantity_en.bind('<Return>',self.quantity_func)
-
+        self.quantity_en.bind('<Return>',self.quantity_func)
+        self.quantity_en.bind('<Right>',self.quantity_func)
+        self.quantity_en.bind('<Left>',lambda event: self.item_combobox.focus())
+        self.rate_l=Label(self.disc_body_frame,text='Rate *',bg=background,fg=foreground,bd=0,font=self.main_font)
+        self.rate_l.grid(row=3,column=2,sticky=t.W,padx=30)
+        self.rate_en=Entry(self.disc_body_frame,width=16,textvariable=self.rate,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.rate_en.grid(row=4,column=2,padx=30,sticky=t.W)
+        self.rate_validation=self.rate_en.register(correct)                                # Input only Integer type
+        self.rate_en.config(validate="key",validatecommand=(self.rate_validation,"%P"))
+        self.rate_en.bind('<Return>',lambda event:self.addcart_func())
+        self.rate_en.bind('<Left>',lambda event: self.quantity_en.focus())
+        self.rate_en.bind('<Right>',lambda event:self.addcart_func())
         self.invoice_l=Label(self.disc_body_frame,text='Invoice No. *',bg=background,fg=foreground,bd=0,font=self.main_font)
-        self.invoice_l.grid(row=3,column=0,sticky=t.W,padx=30)
+        self.invoice_l.grid(row=0,column=0,sticky=t.W,padx=30)
         self.invoice_en=Entry(self.disc_body_frame,width=14,bg='white',fg=foreground,font='candara 17',bd=2)
-        self.invoice_en.grid(row=4,column=0,padx=30,sticky=t.W)
+        self.invoice_en.grid(row=1,column=0,padx=30,sticky=t.W)
         self.invoice_en.insert(END,50*random.randint(50,100))
         self.invoice_en.config(state='readonly')
-
         self.date_l=Label(self.disc_body_frame,text='Date Time',bg=background,fg=foreground,bd=0,font=self.main_font)
-        self.date_l.grid(row=3,column=1,sticky=t.W,padx=30)
-        self.date_en=Entry(self.disc_body_frame,width=16,bg='white',fg=foreground,font='candara 17',bd=2)
-        self.date_en.grid(row=4,column=1,sticky=t.E,padx=30)
-        self.date_en.insert(END,str(datetime.now().strftime('%H:%M:%S')+str(' | ')+str(date.today().strftime('%d/%m/%y'))))
-        self.date_en.bind('<Return>',lambda event: self.item_en.focus())
-        self.date_en.bind('<Right>',lambda event: self.item_en.focus())
-        self.date_en.bind('<Left>',lambda event: self.table_combobox.focus())
-
-
-
+        self.date_l.grid(row=0,column=1,sticky=t.W,padx=100)
+        self.date_en=Entry(self.disc_body_frame,width=15,bg='white',fg=foreground,font='candara 17',bd=2)
+        self.date_en.grid(row=1,column=1,sticky=t.W,padx=100)
+        self.date_en.insert(END,str(date.today().strftime('%d/%m/%y')+str(' | ')+datetime.now().strftime('%H:%M:%S')))
+        self.date_en.bind('<Return>',lambda event: self.item_combobox.focus())
+        self.date_en.bind('<Right>',lambda event: self.item_combobox.focus())
         self.unit_l=Label(self.disc_body_frame,text='Unit',bg=background,fg=foreground,bd=0,font=self.main_font)
-        self.unit_l.grid(row=3,column=2,sticky=t.W,padx=30)
+        self.unit_l.grid(row=0,column=2,sticky=t.W,padx=30)
         self.unit_add_frame=Frame(self.disc_body_frame,bg=background,bd=0)
-        self.unit_add_frame.grid(row=4,column=2)
+        self.unit_add_frame.grid(row=1,column=2,padx=10)
         self.unit_en=Entry(self.unit_add_frame,textvariable=self.unit,width=11,bg='white',fg=foreground,font='candara 17',bd=2)
         self.unit_en.grid(row=0,column=0)
+        self.unit_en.bind('<Return>',lambda event:self.addcart_func())
+        self.unit_en.bind('<Up>',lambda event:self.rate_en.focus())
+        self.unit_en.bind('<Right>',lambda event:self.rate_en.focus())
         self.addcart=Button(self.unit_add_frame,image=self.addcart_ico,bg=background,activebackground=background,bd=0,command=self.addcart_func)
         self.addcart.grid(row=0,column=1)
         self.addcart.bind('<Return>',lambda event: self.addcart_func())
-
-
-        
-
-        
-        # self.waiter_l=Label(self.disc_body_frame,text='Waiter Name',bg=background,fg=foreground,bd=0,font=self.main_font)
-        # self.waiter_l.grid(row=0,column=0,sticky=t.W,padx=15)
-        # #------------fetch Waiters name----------------
-        # self.combo_values=[]
-        # try:
-        #     my_cursor.execute('SELECT Empl_name,Empl_type FROM employees_Record ')
-        #     self.Category_list=my_cursor.fetchall()
-        #     for cat in self.Category_list:
-        #         if cat[1] == 'Waiter':
-        #             self.combo_values.append(cat[0])
-        # except:
-        #     self.combo_values.append('None')
-        # #-----------------------------------
-        # self.waiter_combobox=ttk.Combobox(self.disc_body_frame,width=18,font='candara 17',state="readonly")
-        # self.waiter_combobox["values"]=self.combo_values
-        # self.waiter_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
-        # self.waiter_combobox.grid(row=1,column=0,sticky=t.W,padx=20)
-        # self.waiter_combobox.focus()
-        # self.waiter_combobox.bind('<Return>',lambda event: self.table_combobox.focus())
-        # self.waiter_combobox.bind('<Right>',lambda event: self.table_combobox.focus())
-
-        # self.table_l=Label(self.disc_body_frame,text='Table *',bg=background,fg=foreground,bd=0,font=self.main_font)
-        # self.table_l.grid(row=0,column=1,sticky=t.W,padx=20)
-        # self.table_combobox=ttk.Combobox(self.disc_body_frame,width=16,font='candara 17')
-        # self.table_combobox["values"]=['1','2','3','4','5']
-        # self.table_combobox.option_add('*TCombobox*Listbox.font',("candara",16))
-        # self.table_combobox.grid(row=1,column=1,padx=30)
-        # self.table_combobox.bind('<Return>',lambda event: self.item_en.focus())
-        # self.table_combobox.bind('<Right>',lambda event: self.date_en.focus())
-        # self.table_combobox.bind('<Left>',lambda event: self.waiter_combobox.focus())   
-
-        
-
-          
-
         self.empty_l=Label(self.disc_body_frame,bg=background,fg=foreground,bd=0,font=self.main_font)
         self.empty_l.grid(row=2,column=0)
-
-        
-        
-
-
-        
-
-        # self.item_en=Entry(self.disc_body_frame,width=19,bg='white',fg=foreground,font='candara 17',bd=2)
-        # self.item_en.grid(row=4,column=0,sticky=t.W,padx=20)
-        # self.item_en.bind('<Return>',self.item_return)
-        # self.item_en.bind('<Up>',lambda event: self.waiter_combobox.focus())
-
-        
-
-        
-
-        
         self.cart_frame=Frame(self.primary_body_frame,bg=background)
         self.cart_frame.grid(row=1,column=0,pady=10)
         self.cart_label=Label(self.cart_frame,bg=background,font='candara 16 bold',bd=0,text='Selected Items List',width=96,fg=foreground)
@@ -1301,10 +1291,10 @@ class POS:
     def item_return(self,event):
         '''this function check the item in database if not found it return list of items'''
         item_discription=self.item_func()
-        if self.item_en.get() in  item_discription:
+        if self.item_combobox.get() in  item_discription:
             self.quantity_en.focus()
         else:
-            self.items_list(self.item_en,'Saved Items',background,foreground)
+            self.item_combobox.focus()
     def item_func(self):
         ''' This function check the item in database if item is found it return Discription of item'''
         my_cursor.execute('SELECT Item_name,Rate,Category FROM Items_Record')
@@ -1314,67 +1304,130 @@ class POS:
             if self.item_combobox.get() in item:
                 item_discription=item
         return item_discription
-    def items_list(self,en,tit,background,foreground):
-        '''This function create the listbox of items in toplevel window'''
-        root = Toplevel()
-        root.title(tit)
-        select=[]
-        items_l=[]
-        my_cursor.execute('SELECT Item_name FROM Items_Record')
-        data=my_cursor.fetchall()
-        for cat in data:
-            items_l.append(cat[0])
-        items_l.sort(key=lambda x: x[0])
-        root.geometry("245x200+155+440")
-        def CurSelet(event):
-            widget = event.widget
-            selection=widget.curselection()
-            picked = widget.get(selection[0])
-            select.append(picked)
-        def lb_bind(event):
-            en.delete(0,END)
-            en.insert(END,select[-1])
-            root.destroy()
-        listbox = Listbox(root,width=25,height=40,selectbackground=foreground,background=background,font=('times',13)) 
-        listbox.bind('<<ListboxSelect>>',CurSelet)
-        root.bind("<Return>",lb_bind)
-        listbox.pack(side = LEFT, fill = BOTH) 
-        scrollbar = Scrollbar(root,bg=background) 
-        scrollbar.pack(side = RIGHT, fill = BOTH)
-        for i in items_l:
-            listbox.insert(END,i)
-        def esc(event):
-            root.destroy()
-        listbox.focus_force() 
-        listbox.config(yscrollcommand = scrollbar.set) 
-        scrollbar.config(command = listbox.yview) 
-        root.bind("<Escape>",esc)
-        root.resizable(0,0)
-        root.attributes('-toolwindow', True)
-        root.overrideredirect(1)
-    # def quantity_func(self,event):
-    #     '''This function automate the item rate and unit''' 
-    #     self.item=self.item_func()
-    #     self.rate_en.insert(END,int(self.item[1]))
-    #     self.unit_en.insert(END,self.item[2])
-    #     self.unit_en.config(state='readonly')
-    #     self.addcart.focus()
+    def quantity_func(self,event):
+         '''This function automate the item rate and unit''' 
+         self.item=self.item_func()
+         self.rate_en.insert(END,int(self.item[1]))
+         self.unit_en.delete(0,END)
+         self.unit_en.insert(END,self.item[2])
+         self.unit_en.config(state='readonly')
+         self.addcart.focus()
     def addcart_func(self):
         '''This function insert data in tree view and create buttons'''
         if self.unit_en.get() =="":
             messagebox.showerror(parent=self.pos_win,title='Error',message='Please add Item Discription')
         else:
-            self.insert_treeview()
-            self.item_combobox.delete(0,END)
+            self.insert_treeview() 
             self.quantity_en.delete(0,END)
             self.rate_en.delete(0,END)
             self.unit_en.delete(0,END)
+            self.item_combobox.set('')
+            self.item_combobox.SelectedIndex=-1
             self.item_combobox.focus()
-            self.submit_b=Button(self.cart_frame,bg=background,image=self.delete_ico,activebackground=background,bd=0)
-            self.submit_b.grid(row=0,column=0,sticky=W,padx=340)
+            self.submit_b=Button(self.cart_frame,bg=background,image=self.submit_ico,activebackground=background,bd=0,command=self.pdf)
+            self.submit_b.grid(row=4,column=0,sticky=E,pady=10)
             self.delete_b=Button(self.cart_frame,image=self.delete_ico,bg=background,bd=0,activebackground=background)
-            self.delete_b.grid(row=0,column=0,sticky=E,padx=300)
+            self.delete_b.grid(row=4,column=0,sticky=E,padx=150,pady=10)
             self.cart_frame.grid(row=1,column=0)
+    def pdf(self):
+        dir=os.path.dirname(reportlab.__file__)
+        font_folder=os.path.join(dir,'fonts')
+        custom_font_folder=os.path.join(font_folder,'sans.ttf')
+        custom_font=TTFont('sans',custom_font_folder)
+        pdfmetrics.registerFont(custom_font)
+        custom_font_folder1=os.path.join(font_folder,'sans bold.ttf')
+        custom_font1=TTFont('sans bold',custom_font_folder1)
+        pdfmetrics.registerFont(custom_font1)
+        self.cart=[]
+        for line in self.data_tree.get_children():
+            for value in self.data_tree.item(line)['values']:
+                self.cart.append(value)
+        self.item=[]  
+        self.quan=[] 
+        self.rate=[]
+        self.price=[] 
+        self.l=len(self.cart) 
+        i=0
+        j=1
+        k=2
+        l=3
+        while i<self.l:
+            self.item.append(self.cart[i])
+            i=i+5
+        while j<self.l:
+            self.quan.append(self.cart[j])
+            j=j+5
+        while k<self.l:
+            self.rate.append(self.cart[k])
+            k=k+5    
+        while l<self.l:
+            self.price.append(self.cart[l])
+            l=l+5    
+        pagesize=(58 * mm, (60+(4*len(self.item)))*mm)
+        pdf=canvas.Canvas('POS.pdf',pagesize=pagesize)
+        pdf.setFont("sans bold",10)
+        q=((240/92)*(60+(4*len(self.item))))
+        pdf.drawString(45,q,"ABC RESTUARANT")
+        pdf.setFont("sans",8)
+        pdf.drawString(15,q-6,"---------------------------------")
+        pdf.drawString(22,q-13,"Address line 1, Address line 2")
+        pdf.drawString(53,q-22,"Contact details")
+        pdf.drawString(15,q-27,"---------------------------------")
+        pdf.setFont("sans bold",9)
+        pdf.drawString(56,q-38,"TAX INVOICE")
+        pdf.setFont("sans",8)
+        pdf.drawString(10,q-50,"Invoice No : ")
+        pdf.drawString(60,q-50,self.invoice_en.get())
+        pdf.drawString(10,q-57,"Date : ")
+        pdf.drawString(38,q-57,self.date_en.get())
+        pdf.drawString(9,q-67,"-------------------------------------")
+        pdf.setFont("sans",9)
+        pdf.drawString(10,q-75,'Item')
+        pdf.drawString(80,q-75,'Qty')
+        pdf.drawString(105,q-75,'Rate')
+        pdf.drawString(135,q-75,'Price')
+        pdf.setFont("sans",8)
+        pdf.drawString(9,q-80,"-------------------------------------")
+        y=q-88
+        for k in self.item:
+            s=str(k)
+            pdf.drawString(9,y,s)
+            y=y-10
+        y=q-88
+        for n in self.rate:
+            p=str(n) 
+            pdf.drawString(105,y,p)
+            y=y-10    
+        y=q-88   
+        for l in self.quan:
+            u=str(l) 
+            pdf.drawString(85,y,u)
+            y=y-10
+        y=q-88   
+        for m in self.price:
+            z=str(m)
+            pdf.drawString(136,y,z)
+            y=y-10   
+        y=((q-88)-(len(self.item)*10))
+        pdf.drawString(9,y,"-------------------------------------")
+        pdf.setFont("sans",9)
+        pdf.drawString(60,y-10,'Sub-Total : ')
+        pdf.drawString(129,y-10,str(1.000*self.total_amount_value))
+        pdf.drawString(60,y-20,'CGST @2.5% : ')
+        pdf.drawString(134,y-20,str(0.025*self.total_amount_value))
+        pdf.drawString(60,y-30,'SGST @2.5% : ')
+        pdf.drawString(134,y-30,str(0.025*self.total_amount_value))
+        pdf.setFont("sans",8)
+        pdf.drawString(9,y-40,"-------------------------------------")
+
+        pdf.setFont("sans bold",10)
+        pdf.drawString(65,y-50,'TOTAL : ')
+        pdf.drawString(122,y-50,str(1.00*(self.total_amount_value)+(self.total_amount_value*0.050)))
+        pdf.setFont("sans",8)
+        pdf.drawString(9,y-60,"-------------------------------------")
+        print(y)
+        pdf.save()
+        webbrowser.open_new("POS.pdf")        
     def tree_view(self):
         '''This function creates the  Empty Tree view'''
         self.style=ttk.Style()  
@@ -1400,7 +1453,6 @@ class POS:
         self.data_tree.heading("2",text="Rate")
         self.data_tree.heading("3",text='Amount')
         self.data_tree.heading("4",text='Unit')
-        #self.insert_treeview() 
         self.data_tree.grid(row=0,column=0) 
     def insert_treeview(self):
         '''This function insert data in tree view'''
@@ -1421,7 +1473,6 @@ class POS:
         self.total_amount.grid(row=3,column=0,sticky=E)
         self.sub_total_l=Label(self.cart_frame,bg='white',font='candara 16 bold',bd=0,text='Sub Total',width=25,fg=foreground)
         self.sub_total_l.grid(row=3,column=0,sticky=W)
-
 class Report:
     def __init__(self):
         self.rep_win=Toplevel()
@@ -1450,6 +1501,13 @@ class Report:
 
 
 
+    
+        
+        
+            
+
+
+
 
 
 
@@ -1457,4 +1515,3 @@ class Report:
 
 if __name__ == "__main__":
     Home()
-   
